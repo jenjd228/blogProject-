@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import org.w3c.dom.Text;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,7 +29,7 @@ public class Posts {
     private Integer userId;
 
     @NotNull
-    private Date time;
+    private LocalDateTime time;
 
     @NotNull
     private String title;

@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import org.w3c.dom.Text;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -20,7 +21,7 @@ public class Users {
 
     @NotNull
     @Column(name = "reg_time")
-    private Date regTime;
+    private LocalDateTime regTime;
 
     @NotNull
     private String name;

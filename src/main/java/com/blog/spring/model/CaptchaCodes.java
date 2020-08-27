@@ -3,7 +3,7 @@ package com.blog.spring.model;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 public class CaptchaCodes {
@@ -14,7 +14,7 @@ public class CaptchaCodes {
     private Integer id;
 
     @NotNull
-    private Date time;
+    private LocalDateTime time;
 
     @NotNull
     private String code;
