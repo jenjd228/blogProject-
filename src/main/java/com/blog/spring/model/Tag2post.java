@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "tag_2_post")
 public class Tag2post {
 
     @Id
@@ -14,9 +15,13 @@ public class Tag2post {
 
     @NotNull
     @Column(name = "post_id")
+    //@JoinColumn(name = "post_id")
+    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer postId;
 
     @NotNull
     @Column(name = "tag_id")
+    //@JoinColumn(name = "tag")
+    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer tagId;
 }

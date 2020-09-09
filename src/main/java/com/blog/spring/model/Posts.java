@@ -2,13 +2,16 @@ package com.blog.spring.model;
 
 import com.blog.spring.ModerationStatus;
 import com.sun.istack.NotNull;
-import org.w3c.dom.Text;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Posts {
 
     @Id
@@ -17,16 +20,29 @@ public class Posts {
     private Integer id;
 
     @NotNull
+    @Column(name = "is_active")
     private Integer isActive;
 
     @NotNull
-    private Enum<ModerationStatus> moderation_status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation_status",nullable = false, columnDefinition =  "enum('NEW','ACCEPTED','DECLINED')")
+    private ModerationStatus moderationStatus;
 
+    //@JoinColumn(name = "moderator")
+    //@ManyToOne(cascade = CascadeType.ALL)
+    //private Users moderator;
+
+    @Column(name = "moderator_id")
     private Integer moderatorId;
 
     @NotNull
-    @Column(name = "user_id")
+    @Column(name = "user_id",nullable=false)
     private Integer userId;
+
+    @NotNull
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    @ManyToOne(optional=false,cascade = CascadeType.ALL)
+    private Users user;
 
     @NotNull
     private LocalDateTime time;

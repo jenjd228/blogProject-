@@ -1,11 +1,10 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
-import org.w3c.dom.Text;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 public class Users {
@@ -36,5 +35,7 @@ public class Users {
 
     private String photo;
 
-
+    public String getName() {
+        return name;
+    }
 }
