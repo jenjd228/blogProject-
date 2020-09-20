@@ -1,4 +1,4 @@
-package com.blog.spring;
+package com.blog.spring.model;
 
 public enum ModerationStatus {
     NEW,

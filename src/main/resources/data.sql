@@ -8,10 +8,21 @@ INSERT INTO post_comments (id,parent_id,post_id,user_id,time,text) VALUES (2,2,2
 INSERT INTO post_comments (id,parent_id,post_id,user_id,time,text) VALUES (3,1,3,4,'2020-07-29T18:13:49.748118500','Ничего не понимаю');
 INSERT INTO post_comments (id,parent_id,post_id,user_id,time,text) VALUES (4,1,1,1,'2020-08-29T18:12:59.748118500','Сколько времени ?');
 
-INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (1,1,1,'2020-01-29T18:22:51.748118500',1);
-INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (2,2,2,'2020-02-29T18:22:55.748118500',1);
-INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (3,1,3,'2020-03-29T18:22:52.748118500',-1);
-INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (4,2,3,'2020-01-29T18:22:55.748118500',-1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (1,2,1,'2020-01-29T18:22:51.748118500',1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (2,2,1,'2020-02-29T18:22:55.748118500',-1);
+
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (3,2,2,'2020-02-29T18:22:55.748118500',1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (4,2,2,'2020-02-29T18:22:55.748118500',-1);
+
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (5,1,3,'2020-03-29T18:22:52.748118500',1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (6,2,3,'2020-01-29T18:22:55.748118500',-1);
+
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (7,1,5,'2020-01-29T18:22:55.748118500',-1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (8,2,5,'2020-01-29T18:22:55.748118500',1);
+
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (9,4,4,'2020-01-29T18:22:55.748118500',1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (10,1,4,'2020-01-29T18:22:55.748118500',1);
+INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (11,2,4,'2020-01-29T18:22:55.748118500',1);
 
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (1,1,3);
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (2,2,3);
@@ -28,7 +39,11 @@ INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALU
 INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALUES (3,1,'2020-08-29T18:22:53.748118500','Bella','kocaba@sfedu.ru','1243','dw23d2','awdawd32');
 INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALUES (4,0,'2020-08-29T18:22:54.748118500','Max','ekocaba@gmail.com','122','dw5d2','awdawd32');
 
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (1,1,'NEW',4,1,'2020-08-29T18:22:50.748118500','Физика','Hello world1!',124532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (2,0,'NEW',4,2,'2020-08-29T18:22:59.748118500','Физра','Hello world2!',1532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (3,1,'NEW',4,3,'2020-08-29T18:22:57.748118500','Книга','Hello world3!',12532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (4,0,'NEW',4,2,'2020-08-29T18:22:55.748118500','Программа','Hello world4!',1534532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (1,1,'ACCEPTED',4,1,'2020-08-29T18:22:50.748118500','Физика','Hello world1!',124532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (2,1,'ACCEPTED',4,2,'2020-08-29T18:22:59.748118500','Физра','Hello world2!',1532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (3,1,'ACCEPTED',4,3,'2020-08-29T18:22:57.748118500','Книга','Hello world3!',12532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (4,1,'ACCEPTED',4,2,'2020-08-29T18:22:55.748118500','Программа','Hello world4!',15332);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (5,1,'ACCEPTED',4,1,'2020-08-29T18:21:55.748118500','Программа1','Hello world4!',154532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (6,0,'NEW',4,1,'2020-08-29T18:22:50.748118500','Физик123а','Hello world11!',12453);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (7,1,'ACCEPTED',4,1,'2020-08-29T18:22:50.748118500','Нет лайков','Hello wor2d1!',12422);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (8,1,'ACCEPTED',1,1,'2020-12-29T18:22:50.748118500','Проверка времени','Hello wor2d1!',422);

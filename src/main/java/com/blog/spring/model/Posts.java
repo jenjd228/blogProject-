@@ -1,11 +1,14 @@
 package com.blog.spring.model;
 
-import com.blog.spring.ModerationStatus;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -56,5 +59,20 @@ public class Posts {
     @NotNull
     @Column(name = "view_count")
     private Integer viewCount;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    @Where(clause = "value = -1")
+    private List<PostVotes> dislikeVotes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    @Where(clause = "value = 1")
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private List<PostVotes> likeVotes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    private List<PostComments> commentCount;
 
 }

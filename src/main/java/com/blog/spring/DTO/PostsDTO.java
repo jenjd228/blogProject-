@@ -1,20 +1,19 @@
 package com.blog.spring.DTO;
 
-import com.blog.spring.ModerationStatus;
-import com.blog.spring.model.Users;
+import com.blog.spring.model.PostComments;
+import com.blog.spring.model.PostVotes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostsDTO  {
-
-    //interface GetApiPosts {}
 
     private Integer id;
 
@@ -38,4 +37,15 @@ public class PostsDTO  {
         this.timestamp = timestamp.toEpochSecond(ZoneOffset.UTC);
     }
 
+    public void setLikeCount(List<PostVotes> list){
+        this.likeCount = list.size();
+    }
+
+    public void setDislikeCount(List<PostVotes> list){
+        this.dislikeCount = list.size();
+    }
+
+    public void setCommentCount(List<PostComments> list){
+        this.commentCount = list.size();
+    }
 }

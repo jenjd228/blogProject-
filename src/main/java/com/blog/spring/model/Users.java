@@ -1,7 +1,6 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
-import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
