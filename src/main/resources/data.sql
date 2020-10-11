@@ -39,11 +39,11 @@ INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALU
 INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALUES (3,1,'2020-08-29T18:22:53.748118500','Bella','kocaba@sfedu.ru','1243','dw23d2','awdawd32');
 INSERT INTO users (id,is_moderator,reg_time,name,email,password,code,photo) VALUES (4,0,'2020-08-29T18:22:54.748118500','Max','ekocaba@gmail.com','122','dw5d2','awdawd32');
 
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (1,1,'ACCEPTED',4,1,'2020-08-29T18:22:50.748118500','Физика','Hello world1!',124532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (2,1,'ACCEPTED',4,2,'2020-08-29T18:22:59.748118500','Физра','Hello world2!',1532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (3,1,'ACCEPTED',4,3,'2020-08-29T18:22:57.748118500','Книга','Hello world3!',12532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (4,1,'ACCEPTED',4,2,'2020-08-29T18:22:55.748118500','Программа','Hello world4!',15332);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (5,1,'ACCEPTED',4,1,'2020-08-29T18:21:55.748118500','Программа1','Hello world4!',154532);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (6,0,'NEW',4,1,'2020-08-29T18:22:50.748118500','Физик123а','Hello world11!',12453);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (7,1,'ACCEPTED',4,1,'2020-08-29T18:22:50.748118500','Нет лайков','Hello wor2d1!',12422);
-INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (8,1,'ACCEPTED',1,1,'2020-12-29T18:22:50.748118500','Проверка времени','Hello wor2d1!',422);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (1,1,'ACCEPTED',4,1,'1602192493','Физика','Hello world1!',124532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (2,1,'ACCEPTED',4,2,'1602192491','Физра','А что если!',1532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (3,1,'ACCEPTED',4,3,'1034640000','Hello world','Hello world3!',12532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (4,1,'ACCEPTED',4,2,'1602192494','Программа','Привет world4!',15332);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (5,1,'ACCEPTED',4,1,'1034640000','Программа112вф','Hello world4!',154532);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (6,0,'NEW',4,1,'1034640000','Физик123а','Hello world6!',12453);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (7,1,'ACCEPTED',4,1,'1602192294','Нет лайков','Опять же физика!',12422);
+INSERT INTO posts (id,is_active,moderation_status,moderator_id,user_id,time,title,text,view_count) VALUES (8,1,'ACCEPTED',1,1,'1602192194','Проверка времени','Физика!',422);

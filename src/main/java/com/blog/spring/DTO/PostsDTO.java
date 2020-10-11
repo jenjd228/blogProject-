@@ -33,19 +33,13 @@ public class PostsDTO  {
 
     private Integer viewCount;
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp.toEpochSecond(ZoneOffset.UTC);
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;//.toEpochSecond(ZoneOffset.UTC);
     }
 
-    public void setLikeCount(List<PostVotes> list){
-        this.likeCount = list.size();
-    }
+    public void setLikeCount(List<PostVotes> list){ this.likeCount = list.size(); }
 
-    public void setDislikeCount(List<PostVotes> list){
-        this.dislikeCount = list.size();
-    }
+    public void setDislikeCount(List<PostVotes> list){ this.dislikeCount = list.size(); }
 
-    public void setCommentCount(List<PostComments> list){
-        this.commentCount = list.size();
-    }
+    public void setCommentCount(List<PostComments> list){ this.commentCount = list.size(); }
 }

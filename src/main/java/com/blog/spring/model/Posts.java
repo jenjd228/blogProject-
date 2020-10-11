@@ -48,7 +48,7 @@ public class Posts {
     private Users user;
 
     @NotNull
-    private LocalDateTime time;
+    private Long time;
 
     @NotNull
     private String title;

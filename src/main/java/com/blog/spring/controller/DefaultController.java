@@ -23,7 +23,7 @@ public class DefaultController {
             GlobalSettings multiUserMode = new GlobalSettings(1,"MULTIUSER_MODE","Многопользовательский режим","YES");
             GlobalSettings postPreModeration = new GlobalSettings(2,"POST_PREMODERATION","Премодерация постов","YES");
             GlobalSettings statisticsIsPublic = new GlobalSettings(3,"STATISTICS_IS_PUBLIC","Показывать всем статистику блога","YES");
-            List<GlobalSettings> settings = Arrays.asList(multiUserMode,postPreModeration,statisticsIsPublic);
+            List<GlobalSettings> settings = Arrays.asList(multiUserMode, postPreModeration, statisticsIsPublic);
             globalSettingsRepository.saveAll(settings);
         }
     }

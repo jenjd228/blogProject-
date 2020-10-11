@@ -1,17 +1,21 @@
 package com.blog.spring.model;
 
+import com.blog.spring.DTO.PostsDTO;
+
+import java.util.List;
+
 public class PostsForResponse {
 
-    public PostsForResponse(Object[] list){
-        this.list = list;
-        this.count = list.length;
-    }
-
-    private Object[] list;
+    private List<PostsDTO> list;
 
     private Integer count;
 
-    public Object[] getPosts() {
+    public PostsForResponse(List<PostsDTO> list){
+        this.list = list;
+        this.count = list.size();
+    }
+
+    public List<PostsDTO> getPosts() {
         return list;
     }
 
