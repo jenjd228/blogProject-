@@ -7,15 +7,18 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Posts {
+public class Posts implements Serializable {
 
     @Id
     @NotNull
@@ -74,5 +77,12 @@ public class Posts {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
     private List<PostComments> commentCount;
+
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(name = "tag_2_post",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tags> tags ;
 
 }

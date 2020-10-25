@@ -13,7 +13,7 @@ public class SpringConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-        PropertyMap<Posts, PostsDTO> propertyMap = new PropertyMap<Posts, PostsDTO> (){
+        PropertyMap<Posts, PostsDTO> propertyMap = new PropertyMap<>() {
             protected void configure() {
                 map().setAnnounce(source.getText());
                 map().setTimestamp(source.getTime());
@@ -22,9 +22,7 @@ public class SpringConfig {
                 map().setCommentCount(source.getCommentCount());
             }
         };
-        //modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.addMappings(propertyMap);
-
         return modelMapper;
     }
 }

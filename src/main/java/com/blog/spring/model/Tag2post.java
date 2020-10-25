@@ -1,10 +1,17 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "tag_2_post")
 public class Tag2post {
 
@@ -15,8 +22,6 @@ public class Tag2post {
 
     @NotNull
     @Column(name = "post_id")
-    //@JoinColumn(name = "post_id")
-    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer postId;
 
     @NotNull
