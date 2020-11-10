@@ -1,9 +1,11 @@
 package com.blog.spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 import javax.persistence.*;
 import java.util.List;
@@ -26,6 +28,7 @@ public class Tags {
     @JoinColumn(name = "tag_id")
     private List<Tag2post> tag2posts;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private List<Posts> posts;
 

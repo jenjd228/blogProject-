@@ -1,11 +1,13 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Table(name = "post_comments")
 public class PostComments {
 
@@ -34,13 +36,13 @@ public class PostComments {
     @Column(name = "user_id")
     private Integer userId;
 
-    //@NotNull
-    //@JoinColumn(name = "user_id")
-    //@ManyToOne(cascade = CascadeType.ALL)
-    //private Users user;
+    @NotNull
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Users user;
 
     @NotNull
-    private LocalDateTime time;
+    private Long time;
 
     @NotNull
     private String text;

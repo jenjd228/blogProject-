@@ -42,7 +42,7 @@ public class Posts implements Serializable {
     private Integer moderatorId;
 
     @NotNull
-    @Column(name = "user_id",nullable=false)
+    @Column(name = "user_id")
     private Integer userId;
 
     @NotNull
@@ -74,8 +74,8 @@ public class Posts implements Serializable {
     @LazyCollection(LazyCollectionOption.EXTRA)
     private List<PostVotes> likeVotes;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    @OneToMany()
+    @JoinColumn(name = "post_id")
     private List<PostComments> commentCount;
 
     @ManyToMany(cascade = { CascadeType.ALL })

@@ -1,11 +1,13 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 public class Users {
 
     @Id

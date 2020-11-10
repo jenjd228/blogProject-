@@ -22,7 +22,7 @@ public interface PostsRepository extends CrudRepository<Posts, Long> {
     List<Posts> findByCommentCount(Pageable pageable, Long time);
 
     @Query("SELECT e FROM Posts e where e.isActive = 1 AND e.moderationStatus = 'ACCEPTED' AND e.time <= ?1 AND (e.title like %?2% OR e.text like %?2%)")
-    List<Posts> findByQuery(Pageable pageable, Long time,String search);// WHERE (PlanetName LIKE 'N%'OR PlanetName LIKE '%s')
+    List<Posts> findByQuery(Pageable pageable, Long time,String search);
 
     @Query("SELECT e FROM Posts e where e.isActive = 1 AND e.moderationStatus = 'ACCEPTED' AND e.time <= ?1 AND e.time between ?2 and ?3")
     List<Posts> findByDate(Pageable pageable, Long time, Long date, Long date2);

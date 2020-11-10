@@ -1,7 +1,8 @@
 package com.blog.spring.controller;
 
 import com.blog.spring.DTO.PostsDTO;
-import com.blog.spring.model.PostForGetPost;
+import com.blog.spring.DTO.TagForTagsDTO;
+import com.blog.spring.model.PostForGetByIdPost;
 import com.blog.spring.model.Posts;
 import com.blog.spring.model.PostsForResponse;
 import com.blog.spring.model.Tags;
@@ -49,12 +50,17 @@ public class ApiPostController {
 
     @GetMapping("/api/post/{id}")
     public ResponseEntity<PostsForResponse> getPost(@PathVariable Integer id){
-        System.out.println(id);
-        Set<Tags> post = postsService.getPostById(id);
+        PostForGetByIdPost post = postsService.getPostById(id);
         if (post==null){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(post, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/tag/")
+    public ResponseEntity<PostsForResponse> getTags(@RequestParam String query){
+        List<TagForTagsDTO> tags = postsService.findTagsByQuery(query);
+        return new ResponseEntity(tags,HttpStatus.OK);
     }
 
 

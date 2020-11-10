@@ -32,7 +32,7 @@ public class PostsDTO  {
     private Integer viewCount;
 
     public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;//.toEpochSecond(ZoneOffset.UTC);
+        this.timestamp = timestamp;
     }
 
     public void setLikeCount(List<PostVotes> list){ this.likeCount = list.size(); }

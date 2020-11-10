@@ -1,40 +1,51 @@
 package com.blog.spring.service;
 
 import com.blog.spring.DTO.PostsDTO;
-import com.blog.spring.model.PostForGetPost;
+import com.blog.spring.DTO.TagForTagsDTO;
+import com.blog.spring.model.PostForGetByIdPost;
 import com.blog.spring.model.Posts;
 import com.blog.spring.model.Tag2post;
 import com.blog.spring.model.Tags;
 import com.blog.spring.repository.PostsRepository;
 import com.blog.spring.repository.TagsRepository;
+import org.dom4j.rule.Mode;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
+import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 
 @Service
 public class PostsService {
 
-    private final ModelMapper modelMapper;
+    @Qualifier("modelMapperToPostsDTO")
+    private final ModelMapper modelMapperToPostsDTO;
+
+    @Qualifier("modelMapperForByIdPost")
+    private final ModelMapper modelMapperForByIdPost;
+
+    @Qualifier("modelMapperToTagForTagsDTO")
+    private final ModelMapper modelMapperToTagForTagsDTO;
 
     private final PostsRepository postsRepository;
 
     private final TagsRepository tagsRepository;
 
-    public PostsService(ModelMapper modelMapper, PostsRepository postsRepository, TagsRepository tagsRepository){
-        this.modelMapper = modelMapper;
+    public PostsService(ModelMapper modelMapperToTagForTagsDTO,ModelMapper modelMapperToPostsDTO,ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository){
+        this.modelMapperToTagForTagsDTO = modelMapperToTagForTagsDTO;
+        this.modelMapperForByIdPost = modelMapperForByIdPost;
+        this.modelMapperToPostsDTO = modelMapperToPostsDTO;
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
 
@@ -62,12 +73,10 @@ public class PostsService {
         return list.stream().map(this::convertToDto).collect(toList());
     }
 
-    public Set<Tags> getPostById(Integer id){
+    public PostForGetByIdPost getPostById(Integer id){
         Posts post = postsRepository.findPostsById(id);
-        if (post==null){
-            return null;
-        }
-        return post.getTags();
+        //postForGetByIdPost = Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
+        return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 
     public List<PostsDTO> getPostBySearch(Integer offset, Integer limit, String search){
@@ -83,7 +92,7 @@ public class PostsService {
         Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
         LocalDate dateForFind = LocalDate.parse(date);
         Long dateForFind1 = dateForFind.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-        System.out.println(currentDate);
+
         Long dateForFind2 = dateForFind.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 
         Pageable pageable = PageRequest.of(offset / limit, limit);
@@ -108,6 +117,28 @@ public class PostsService {
     }
 
     private PostsDTO convertToDto(Posts post) {
-        return Objects.isNull(post) ? null : modelMapper.map(post, PostsDTO.class);
+        return Objects.isNull(post) ? null : modelMapperToPostsDTO.map(post, PostsDTO.class);
+    }
+
+    public List<TagForTagsDTO> findTagsByQuery(String query){
+        List<TagForTagsDTO> tags;
+        Long postCount =  postsRepository.count();
+        List<Tags> tags1 = (ArrayList<Tags>) tagsRepository.findAll();
+
+        if (query.isEmpty()){
+            tags = (tags1).stream().map(this::convertToTagForTagsDTO).collect(toList());
+        }else {
+            tags = tagsRepository.findTagsByQuery(query).stream().map(this::convertToTagForTagsDTO).collect(toList());
+        }
+        /**
+         * try обычные веса в маппере
+         * потом сорт по весу
+         * потом в норм вид
+         * **/
+        return tags;
+    }
+
+    private TagForTagsDTO convertToTagForTagsDTO(Tags tag) {
+        return Objects.isNull(tag) ? null : modelMapperToTagForTagsDTO.map(tag, TagForTagsDTO.class);
     }
 }
