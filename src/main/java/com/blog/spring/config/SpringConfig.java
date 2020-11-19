@@ -74,7 +74,8 @@ public class SpringConfig {
         ModelMapper modelMapper = new ModelMapper();
         PropertyMap<Tags, TagForTagsDTO> propertyMap = new PropertyMap<>() {
             protected void configure() {
-                map().setWeight(0.);
+
+                map().setWeight(source.getPosts());
             }
         };
         modelMapper.addMappings(propertyMap);

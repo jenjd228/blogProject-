@@ -27,9 +27,11 @@ INSERT INTO post_voters (id,user_id,post_id,time,value) VALUES (11,2,4,'2020-01-
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (1,1,2);
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (2,1,3);
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (3,1,4);
-
 INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (4,3,4);
-INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (5,4,5);
+INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (5,4,1);
+INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (6,4,2);
+INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (7,4,5);
+INSERT INTO tag_2_post (id,post_id,tag_id) VALUES (8,2,5);
 
 INSERT INTO tags (id,name) VALUES (1,'Кто я');
 INSERT INTO tags (id,name) VALUES (2,'Программа');

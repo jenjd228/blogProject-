@@ -2,11 +2,10 @@ package com.blog.spring.controller;
 
 import com.blog.spring.DTO.PostsDTO;
 import com.blog.spring.DTO.TagForTagsDTO;
-import com.blog.spring.model.PostForGetByIdPost;
-import com.blog.spring.model.Posts;
-import com.blog.spring.model.PostsForResponse;
-import com.blog.spring.model.Tags;
+import com.blog.spring.model.*;
 import com.blog.spring.service.PostsService;
+import com.mysql.cj.xdevapi.JsonArray;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +58,10 @@ public class ApiPostController {
 
     @GetMapping("/api/tag/")
     public ResponseEntity<PostsForResponse> getTags(@RequestParam String query){
+        JSONObject jo = new JSONObject();
         List<TagForTagsDTO> tags = postsService.findTagsByQuery(query);
-        return new ResponseEntity(tags,HttpStatus.OK);
+        jo.put("tags",tags);
+        return new ResponseEntity(jo,HttpStatus.OK);
     }
 
 

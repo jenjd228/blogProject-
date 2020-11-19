@@ -124,19 +124,36 @@ public class PostsService {
         List<TagForTagsDTO> tags;
         Long postCount =  postsRepository.count();
         List<Tags> tags1 = (ArrayList<Tags>) tagsRepository.findAll();
+        Double maxWeight = 0.;
 
         if (query.isEmpty()){
             tags = (tags1).stream().map(this::convertToTagForTagsDTO).collect(toList());
         }else {
             tags = tagsRepository.findTagsByQuery(query).stream().map(this::convertToTagForTagsDTO).collect(toList());
         }
-        /**
-         * try обычные веса в маппере
-         * потом сорт по весу
-         * потом в норм вид
-         * **/
+
+        for(TagForTagsDTO tag : tags){
+            tag.setWeight(postCount);
+        }
+
+        tags.sort(tagWeightComparator);
+        maxWeight = tags.get(0).getWeight();
+
+        for (TagForTagsDTO tag : tags){
+            if (tag.getWeight().equals(maxWeight)){
+                tag.setWeight(1.);
+            }else {
+                tag.setWeight(tag.getWeight()*(1/maxWeight));
+                if (tag.getWeight() < 0.3){
+                    tag.setWeight(0.3);
+                }
+            }
+
+        }
         return tags;
     }
+
+    public static Comparator<TagForTagsDTO> tagWeightComparator = (o1, o2) -> o2.getWeight().compareTo(o1.getWeight());
 
     private TagForTagsDTO convertToTagForTagsDTO(Tags tag) {
         return Objects.isNull(tag) ? null : modelMapperToTagForTagsDTO.map(tag, TagForTagsDTO.class);
