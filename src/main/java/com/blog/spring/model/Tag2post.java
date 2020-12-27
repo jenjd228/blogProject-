@@ -26,7 +26,5 @@ public class Tag2post {
 
     @NotNull
     @Column(name = "tag_id")
-    //@JoinColumn(name = "tag")
-    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer tagId;
 }

@@ -16,14 +16,10 @@ public class PostVotes {
 
     @NotNull
     @Column(name = "user_id")
-    //@JoinColumn(name = "user")
-    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer userId;
 
     @NotNull
     @Column(name = "post_id")
-    //@JoinColumn(name = "post")
-    //@ManyToMany(cascade = CascadeType.ALL)
     private Integer postId;
 
     @NotNull

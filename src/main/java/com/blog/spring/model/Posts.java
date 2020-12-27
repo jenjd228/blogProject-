@@ -1,15 +1,16 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,10 +34,6 @@ public class Posts implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status",nullable = false, columnDefinition =  "enum('NEW','ACCEPTED','DECLINED')")
     private ModerationStatus moderationStatus;
-
-    //@JoinColumn(name = "moderator")
-    //@ManyToOne(cascade = CascadeType.ALL)
-    //private Users moderator;
 
     @Column(name = "moderator_id")
     private Integer moderatorId;

@@ -8,18 +8,18 @@ public class PostsForResponse {
 
     private List<PostsDTO> list;
 
-    private Integer count;
+    private long count;
 
-    public PostsForResponse(List<PostsDTO> list){
+    public PostsForResponse(List<PostsDTO> list, long postCount){
         this.list = list;
-        this.count = list.size();
+        this.count = postCount ;
     }
 
     public List<PostsDTO> getPosts() {
         return list;
     }
 
-    public Integer getCount() {
+    public long getCount() {
         return count;
     }
 

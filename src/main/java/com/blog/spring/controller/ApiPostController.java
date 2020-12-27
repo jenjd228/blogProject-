@@ -1,11 +1,9 @@
 package com.blog.spring.controller;
 
-import com.blog.spring.DTO.PostsDTO;
-import com.blog.spring.DTO.TagForTagsDTO;
-import com.blog.spring.model.*;
+import com.blog.spring.model.PostForGetByIdPost;
+import com.blog.spring.model.PostsForResponse;
+import com.blog.spring.repository.PostsRepository;
 import com.blog.spring.service.PostsService;
-import com.mysql.cj.xdevapi.JsonArray;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,37 +12,33 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Set;
-
 @RestController
 public class ApiPostController {
 
     @Autowired
     private PostsService postsService;
 
+    @Autowired
+    private PostsRepository postsRepository;
+
     @GetMapping("/api/post")
     public ResponseEntity<PostsForResponse> getPosts(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String mode) {
-        List<PostsDTO> list = postsService.getPosts(offset, limit, mode);
-        return new ResponseEntity(new PostsForResponse(list), HttpStatus.OK);
+        return new ResponseEntity(postsService.getPosts(offset, limit, mode), HttpStatus.OK);
     }
 
     @GetMapping("/api/post/search/")
     public ResponseEntity<PostsForResponse> getPostBySearch(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String search){
-        List<PostsDTO> list = postsService.getPostBySearch(offset, limit, search);
-        return new ResponseEntity(new PostsForResponse(list), HttpStatus.OK);
+        return new ResponseEntity(postsService.getPostBySearch(offset, limit, search),HttpStatus.OK);
     }
 
     @GetMapping("/api/post/byDate")
     public ResponseEntity<PostsForResponse> getPostByDate(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String date){
-        List<PostsDTO> list = postsService.getPostByDate(offset, limit, date);
-        return new ResponseEntity(new PostsForResponse(list), HttpStatus.OK);
+        return new ResponseEntity(postsService.getPostByDate(offset, limit, date), HttpStatus.OK);
     }
 
     @GetMapping("/api/post/byTag")
     public ResponseEntity<PostsForResponse> getPostByTag(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String tag){
-        List<PostsDTO> list = postsService.getPostsByTag(offset,limit,tag);
-        return new ResponseEntity(new PostsForResponse(list), HttpStatus.OK);
+        return new ResponseEntity(postsService.getPostsByTag(offset,limit,tag), HttpStatus.OK);
     }
 
     @GetMapping("/api/post/{id}")
@@ -55,15 +49,5 @@ public class ApiPostController {
         }
         return new ResponseEntity(post, HttpStatus.OK);
     }
-
-    @GetMapping("/api/tag/")
-    public ResponseEntity<PostsForResponse> getTags(@RequestParam String query){
-        JSONObject jo = new JSONObject();
-        List<TagForTagsDTO> tags = postsService.findTagsByQuery(query);
-        jo.put("tags",tags);
-        return new ResponseEntity(jo,HttpStatus.OK);
-    }
-
-
 
 }

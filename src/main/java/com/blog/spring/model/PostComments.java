@@ -4,7 +4,6 @@ import com.sun.istack.NotNull;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -19,18 +18,9 @@ public class PostComments {
     @Column(name = "parent_id")
     private Integer parentId;
 
-    //@JoinColumn(name = "parent_id")
-    //@OneToOne(cascade =  CascadeType.ALL)
-    //private PostComments parent;
-
     @NotNull
     @Column(name = "post_id")
     private Integer postId;
-
-    //@NotNull
-    //@JoinColumn(name = "post_id")
-    //@ManyToOne(cascade = CascadeType.ALL)
-    //private Posts post;
 
     @NotNull
     @Column(name = "user_id")

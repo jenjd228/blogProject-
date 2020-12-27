@@ -11,16 +11,20 @@ import java.util.List;
 @NoArgsConstructor
 public class TagForTagsDTO {
 
-    String name;
+    private String name;
 
-    Double weight;
+    private Double weight;
 
-    public void setWeight(Long postCount){
+    public void setNormalWeight(Long postCount){
         this.weight = weight / postCount;
     }
 
-    public void setWeight(List<Posts> list){
-        this.weight = (double) list.size();
+    public void setWeightLikePostCount(Object count){
+        this.weight = Double.valueOf(count.toString());
+    }
+
+    public void setNameLikeObject(Object name){
+        this.name = name.toString();
     }
 
     public void setWeight(Double weight){
