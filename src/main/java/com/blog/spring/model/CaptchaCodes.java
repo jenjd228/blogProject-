@@ -1,12 +1,14 @@
 package com.blog.spring.model;
 
 import com.sun.istack.NotNull;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "captcha_codes")
+@Data
 public class CaptchaCodes {
 
     @Id
@@ -15,7 +17,7 @@ public class CaptchaCodes {
     private Integer id;
 
     @NotNull
-    private LocalDateTime time;
+    private long time;
 
     @NotNull
     private String code;

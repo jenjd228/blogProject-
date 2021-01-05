@@ -1,11 +1,13 @@
 package com.blog.spring.service;
 
+import com.blog.spring.DTO.AllStatisticsDTO;
 import com.blog.spring.DTO.PostsDTO;
 import com.blog.spring.DTO.TagForTagsDTO;
 import com.blog.spring.model.*;
 import com.blog.spring.repository.PostsRepository;
 import com.blog.spring.repository.Tag2PostRepository;
 import com.blog.spring.repository.TagsRepository;
+import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -31,9 +33,6 @@ public class PostsService {
     @Qualifier("modelMapperForByIdPost")
     private final ModelMapper modelMapperForByIdPost;
 
-    //@Qualifier("modelMapperToTagForTagsDTO")
-    //private final ModelMapper modelMapperToTagForTagsDTO;
-
     private final PostsRepository postsRepository;
 
     private final TagsRepository tagsRepository;
@@ -41,13 +40,11 @@ public class PostsService {
     private final Tag2PostRepository tag2PostRepository;
 
     public PostsService(ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
-        //this.modelMapperToTagForTagsDTO = modelMapperToTagForTagsDTO;
         this.modelMapperForByIdPost = modelMapperForByIdPost;
         this.modelMapperToPostsDTO = modelMapperToPostsDTO;
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
         this.tag2PostRepository = tag2PostRepository;
-
     }
 
     public PostsForResponse getPosts(Integer offset, Integer limit, String mode) {
@@ -141,6 +138,14 @@ public class PostsService {
 
     private PostsDTO convertToDto(Posts post) {
         return Objects.isNull(post) ? null : modelMapperToPostsDTO.map(post, PostsDTO.class);
+    }
+
+    public AllStatisticsDTO getAllStatistics(){
+        return new AllStatisticsDTO(postsRepository.getPostCount()
+                ,postsRepository.getAllLikeCount()
+                ,postsRepository.getAllDislikeCount()
+                ,postsRepository.getAllViewCount()
+                ,postsRepository.getFirstPostDate());
     }
 
     //private final static Comparator<TagForTagsDTO> tagWeightComparator = (o1, o2) -> o2.getWeight().compareTo(o1.getWeight());

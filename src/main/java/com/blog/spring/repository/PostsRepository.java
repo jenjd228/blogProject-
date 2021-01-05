@@ -46,9 +46,24 @@ public interface PostsRepository extends CrudRepository<Posts, Long> {
     @Query("SELECT COUNT(e) FROM Posts e where e.isActive = 1 AND e.moderationStatus = 'ACCEPTED' AND e.time <= ?1")
     long activePostCount(Long time);
 
+    @Query("SELECT Count(e) FROM Posts e")
+    long getPostCount();
+
     @Query("SELECT distinct DATE_FORMAT(FROM_UNIXTIME(time* 0.001), '%Y') from Posts")
     List<String> getCalendar();
 
     @Query(value ="SELECT time, COUNT(time) as count from ( SELECT DATE_FORMAT(FROM_UNIXTIME(time* 0.001), '%Y-%m-%d') as time from Posts where time >= ?1 and time < ?2 ) as t group by time", nativeQuery = true)
     List<List<String>> getCalendarByYear(Long fromDate, Long toDate);
+
+    @Query("SELECT count(e) FROM PostVotes e where e.value = 1")
+    long getAllLikeCount();
+
+    @Query("SELECT count(e) FROM PostVotes e where e.value = -1")
+    long getAllDislikeCount();
+
+    @Query("SELECT sum(e.viewCount) FROM Posts e")
+    long getAllViewCount();
+
+    @Query("SELECT min(e.time) FROM Posts e")
+    long getFirstPostDate();
 }

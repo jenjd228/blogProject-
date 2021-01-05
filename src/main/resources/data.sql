@@ -1,7 +1,4 @@
-INSERT INTO captcha_codes (id,time,code,secret_code) VALUES (1,'2020-08-29T18:24:59.748118500','123dd','123dd');
-INSERT INTO captcha_codes (id,time,code,secret_code) VALUES (2,'2020-08-29T18:23:59.748118500','241gg','241gg');
-INSERT INTO captcha_codes (id,time,code,secret_code) VALUES (3,'2020-08-29T18:21:59.748118500','24r4f','24r4f');
-INSERT INTO captcha_codes (id,time,code,secret_code) VALUES (4,'2020-08-29T18:22:59.748118500','awd1d','awd1d');
+
 
 INSERT INTO post_comments (id,parent_id,post_id,user_id,time,text) VALUES (1,null,1,1,'16029446621','Вау');
 INSERT INTO post_comments (id,parent_id,post_id,user_id,time,text) VALUES (2,null,2,2,'16029446621','Круто');
