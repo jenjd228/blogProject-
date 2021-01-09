@@ -2,18 +2,22 @@ package com.blog.spring.service;
 
 import com.blog.spring.DTO.AllStatisticsDTO;
 import com.blog.spring.DTO.PostsDTO;
-import com.blog.spring.DTO.TagForTagsDTO;
+import com.blog.spring.DTO.StatisticDTO;
+import com.blog.spring.DTO.Statistics;
 import com.blog.spring.model.*;
+import com.blog.spring.repository.PostVotersRepository;
 import com.blog.spring.repository.PostsRepository;
 import com.blog.spring.repository.Tag2PostRepository;
 import com.blog.spring.repository.TagsRepository;
 import net.minidev.json.JSONObject;
+import org.dom4j.rule.Mode;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,7 +43,13 @@ public class PostsService {
 
     private final Tag2PostRepository tag2PostRepository;
 
-    public PostsService(ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
+    private final AuthService authService;
+
+    private final PostVotersRepository postVotersRepository;
+
+    public PostsService(PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
+        this.postVotersRepository = postVotersRepository;
+        this.authService = authService;
         this.modelMapperForByIdPost = modelMapperForByIdPost;
         this.modelMapperToPostsDTO = modelMapperToPostsDTO;
         this.postsRepository = postsRepository;
@@ -140,17 +150,55 @@ public class PostsService {
         return Objects.isNull(post) ? null : modelMapperToPostsDTO.map(post, PostsDTO.class);
     }
 
-    public AllStatisticsDTO getAllStatistics(){
-        return new AllStatisticsDTO(postsRepository.getPostCount()
-                ,postsRepository.getAllLikeCount()
-                ,postsRepository.getAllDislikeCount()
-                ,postsRepository.getAllViewCount()
-                ,postsRepository.getFirstPostDate());
+    public void addViewToPostIfNotModeratorAndWriter(Integer postId,String sessionId){
+        Posts post = postsRepository.findPostsById(postId);
+
+        if (post!=null){
+            if (!authService.isModeratorBySessionId(sessionId) && !authService.isWriterBySessionId(postId,sessionId)){
+                post.setViewCount(post.getViewCount()+1);
+                postsRepository.save(post);
+            }
+        }
     }
 
-    //private final static Comparator<TagForTagsDTO> tagWeightComparator = (o1, o2) -> o2.getWeight().compareTo(o1.getWeight());
+    public JSONObject like(Integer postId){
+        return likeOrDislikeJsonCreateAndAddToDB(postId,1);
+    }
 
-    //private TagForTagsDTO convertToTagForTagsDTO(Tags tag) {
-     //   return Objects.isNull(tag) ? null : modelMapperToTagForTagsDTO.map(tag, TagForTagsDTO.class);
-    //}
+    public JSONObject dislike(Integer postId){
+        return likeOrDislikeJsonCreateAndAddToDB(postId,-1);
+    }
+
+    private JSONObject likeOrDislikeJsonCreateAndAddToDB(Integer postId,Integer likeOrDislike){
+        JSONObject json = new JSONObject();
+        String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
+        Integer userId = authService.findUserIdBySession(sessionID);
+
+        if (userId == null){
+            json.put("result",false);
+            return json;
+        }
+
+        PostVotes postVotesFromBd = postVotersRepository.getPostVotesByUserIdAndPostId(postId,userId);
+
+        if (postVotesFromBd == null){
+            PostVotes postVotes = new PostVotes();
+            postVotes.setPostId(postId);
+            postVotes.setUserId(userId);
+            postVotes.setValue(likeOrDislike);
+            postVotes.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+            postVotersRepository.save(postVotes);
+            json.put("result",true);
+            return json;
+        }else if (postVotesFromBd.getValue() == (likeOrDislike*-1)){
+            postVotesFromBd.setValue(likeOrDislike);
+            postVotersRepository.save(postVotesFromBd);
+            json.put("result",true);
+            return json;
+        }
+
+        json.put("result",false);
+        return json;
+    }
+
 }

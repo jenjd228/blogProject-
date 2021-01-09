@@ -14,5 +14,8 @@ public interface GlobalSettingsRepository extends CrudRepository<GlobalSettings,
     List<GlobalSettings> findAll();
 
     @Query("SELECT e.value FROM GlobalSettings e where e.code = 'STATISTICS_IS_PUBLIC'")
-    String statisticsIsPublic();
+    String isStatisticsPublic();
+
+    //@Query()
+   // void settingsUpdate();
 }

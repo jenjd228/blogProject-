@@ -21,7 +21,7 @@ public class Users {
 
     @NotNull
     @Column(name = "reg_time")
-    private LocalDateTime regTime;
+    private Long regTime;
 
     @NotNull
     private String name;

@@ -9,10 +9,13 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 @Configuration
 public class SpringConfig {
@@ -75,16 +78,42 @@ public class SpringConfig {
     @Bean
     public ModelMapper modelMapperToTagForTagsDTO() {
         ModelMapper modelMapper = new ModelMapper();
-        System.out.println("dasdasd");
         PropertyMap<TagNameAndWeight, TagForTagsDTO> propertyMap = new PropertyMap<>() {
             @Override
             protected void configure() {
 
             }
         };
-
         modelMapper.addMappings(propertyMap);
         return modelMapper;
-        }
-
     }
+
+    @Bean
+    public ModelMapper modelMapperToStatisticDTO() {
+        ModelMapper modelMapper = new ModelMapper();
+        PropertyMap<Statistics, StatisticDTO> propertyMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+
+            }
+        };
+        modelMapper.addMappings(propertyMap);
+        return modelMapper;
+    }
+
+    @Bean
+    public ModelMapper modelMapperToUserLoginDTO() {
+        ModelMapper modelMapper = new ModelMapper();
+        PropertyMap<Users, UserLoginDTO> propertyMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                map().setModerationInModelMapper(source.getIsModerator());
+                map().setSettingsInModelMapper(source.getIsModerator());
+            }
+        };
+        modelMapper.addMappings(propertyMap);
+        return modelMapper;
+    }
+
+
+}

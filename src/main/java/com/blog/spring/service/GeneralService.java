@@ -1,17 +1,22 @@
 package com.blog.spring.service;
 
-import com.blog.spring.DTO.CalendarDTO;
-import com.blog.spring.DTO.TagForTagsDTO;
-import com.blog.spring.DTO.TagNameAndWeight;
+import com.blog.spring.DTO.*;
+import com.blog.spring.model.GlobalSettings;
+import com.blog.spring.model.Users;
+import com.blog.spring.repository.GlobalSettingsRepository;
+import com.blog.spring.repository.PostVotersRepository;
 import com.blog.spring.repository.PostsRepository;
 import com.blog.spring.repository.Tag2PostRepository;
+import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -24,11 +29,23 @@ public class GeneralService {
     @Qualifier("modelMapperToTagForTagsDTO")
     private final ModelMapper modelMapperToTagForTagsDTO;
 
+    private final ModelMapper modelMapperToStatisticDTO;
+
     private final Tag2PostRepository tag2PostRepository;
 
     private final PostsRepository postsRepository;
 
-    public GeneralService(ModelMapper modelMapperToTagForTagsDTO,PostsRepository postsRepository,Tag2PostRepository tag2PostRepository) {
+    private final GlobalSettingsRepository globalSettingsRepository;
+
+    private final AuthService authService;
+
+    private final PostVotersRepository postVotersRepository;
+
+    public GeneralService(PostVotersRepository postVotersRepository,ModelMapper modelMapperToStatisticDTO,AuthService authService,GlobalSettingsRepository globalSettingsRepository,ModelMapper modelMapperToTagForTagsDTO, PostsRepository postsRepository, Tag2PostRepository tag2PostRepository) {
+        this.postVotersRepository = postVotersRepository;
+        this.modelMapperToStatisticDTO = modelMapperToStatisticDTO;
+        this.authService = authService;
+        this.globalSettingsRepository = globalSettingsRepository;
         this.modelMapperToTagForTagsDTO = modelMapperToTagForTagsDTO;
         this.tag2PostRepository = tag2PostRepository;
         this.postsRepository = postsRepository;
@@ -112,6 +129,46 @@ public class GeneralService {
         posts.forEach(para -> postsForDTO.put(para.get(0),para.get(1)));
 
         return new CalendarDTO(years,postsForDTO);
+    }
+
+    public JSONObject getSettings(){
+        List<GlobalSettings> settingsList = globalSettingsRepository.findAll();
+        JSONObject json = new JSONObject();
+
+        json.put(settingsList.get(0).getCode(), settingsList.get(0).getValue().equals("YES"));
+        json.put(settingsList.get(1).getCode(), settingsList.get(1).getValue().equals("YES"));
+        json.put(settingsList.get(2).getCode(), settingsList.get(2).getValue().equals("YES"));
+        return json;
+    }
+
+    public StatisticDTO getAllStatistics(){
+        Statistics statistics = postVotersRepository.getStatistics();
+        return modelMapperToStatisticDTO.map(statistics,StatisticDTO.class);
+    }
+
+    public StatisticDTO getMyStatistics(String sessionId){
+        Integer id = authService.findUserIdBySession(sessionId);
+        Iterable<Integer> list = postsRepository.getPostIdsByUserId(id);
+        Statistics statistics = postVotersRepository.getMyStatistics(list);
+
+        return modelMapperToStatisticDTO.map(statistics,StatisticDTO.class);
+    }
+
+    public void putSettings(){
+        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+        Users user = authService.findUserBySession(sessionId);
+
+        if (user!= null && user.getIsModerator() == 1){
+            /**
+             *insert into blog.global_settings(code,value) VALUES('MULTIUSER_MODE','NO') ON DUPLICATE KEY UPDATE value = VALUES(value);
+             * TODO
+             *
+             */
+        }
+    }
+
+    public boolean isStatisticPublic(){
+        return globalSettingsRepository.isStatisticsPublic().equals("YES");
     }
 
 }
