@@ -1,7 +1,7 @@
 package com.blog.spring.controller;
 
-import com.blog.spring.DTO.EmailOnlyDTO;
-import com.blog.spring.DTO.PostIdOnlyDTO;
+import com.blog.spring.DTO.*;
+import com.blog.spring.model.ModerationStatus;
 import com.blog.spring.model.PostForGetByIdPost;
 import com.blog.spring.model.PostsForResponse;
 import com.blog.spring.repository.PostsRepository;
@@ -33,42 +33,48 @@ public class ApiPostController {
     @GetMapping
     public ResponseEntity<PostsForResponse> getPosts(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String mode) {
         logger.info("/api/post - Запрос данных постов с mode = " + mode);
-        return new ResponseEntity(postsService.getPosts(offset, limit, mode), HttpStatus.OK);
+        return new ResponseEntity<>(postsService.getPosts(offset, limit, mode), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public JSONObject addPost(@RequestBody AddPostDTO addPostDTO){
+        logger.info("/post - Добавление поста : " + addPostDTO.toString());
+        return postsService.addPost(addPostDTO);
     }
 
     @GetMapping("/search")
     public ResponseEntity<PostsForResponse> getPostBySearch(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String query) {
         logger.info("/search - Запрос данных постов с поиском = " + query);
-        return new ResponseEntity(postsService.getPostBySearch(offset, limit, query), HttpStatus.OK);
+        return new ResponseEntity<>(postsService.getPostBySearch(offset, limit, query), HttpStatus.OK);
     }
 
     @GetMapping("/byDate")
     public ResponseEntity<PostsForResponse> getPostByDate(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String date) {
         logger.info("/byDate - Запрос данных постов по дате : " + date);
-        return new ResponseEntity(postsService.getPostByDate(offset, limit, date), HttpStatus.OK);
+        return new ResponseEntity<>(postsService.getPostByDate(offset, limit, date), HttpStatus.OK);
     }
 
     @GetMapping("/byTag")
     public ResponseEntity<PostsForResponse> getPostByTag(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String tag) {
         logger.info("/byTag - Запрос данных постов по тегу : " + tag);
-        return new ResponseEntity(postsService.getPostsByTag(offset, limit, tag), HttpStatus.OK);
+        return new ResponseEntity<>(postsService.getPostsByTag(offset, limit, tag), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostsForResponse> getPost(@PathVariable Integer id) {
+    public ResponseEntity<PostForGetByIdPost> getPost(@PathVariable Integer id) {
 
-        logger.info("/byTag - Запрос данных постов по id : " + id);
+        logger.info("/{id} - Запрос данных поста по id : " + id);
 
         PostForGetByIdPost post = postsService.getPostById(id);
         if (post == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
 
         postsService.addViewToPostIfNotModeratorAndWriter(id,sessionID);
 
-        return new ResponseEntity(post, HttpStatus.OK);
+        return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
     @PostMapping("like")
@@ -82,5 +88,19 @@ public class ApiPostController {
         logger.info("/dislike - Дизлайк поста с id : " + postIdOnlyDTO.getPost_id());
         return postsService.dislike(postIdOnlyDTO.getPost_id());
     }
+
+    @GetMapping("moderation")
+    public ResponseEntity<PostsForResponse> getPostsForModeration(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String status){
+        logger.info("/moderation - Запрос постов на модерацию : ");
+        return new ResponseEntity<>(postsService.getPostsForModeration(offset, limit, status), HttpStatus.OK);
+    }
+
+    @GetMapping("my")
+    public ResponseEntity<PostsForResponse> my(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String status){
+        logger.info("/my - Запрос постов юзера со статусом : "+status);
+        return new ResponseEntity<>(postsService.my(offset,limit,status),HttpStatus.OK);
+
+    }
+
 
 }

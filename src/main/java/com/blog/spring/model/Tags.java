@@ -1,30 +1,31 @@
 package com.blog.spring.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tags {
+@Table(uniqueConstraints={@UniqueConstraint(columnNames={"name"})})
+public class Tags implements Serializable {
 
     @Id
     @NotNull
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "tag_id")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tag_id",insertable = false, updatable = false, nullable=false)
     private List<Tag2post> tag2posts;
 
     /*@JsonIgnore

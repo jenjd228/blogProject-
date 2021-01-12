@@ -23,7 +23,7 @@ public class Posts implements Serializable {
 
     @Id
     @NotNull
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
@@ -43,22 +43,23 @@ public class Posts implements Serializable {
     private Integer userId;
 
     @NotNull
-    @JoinColumn(name = "user_id", insertable=false, updatable=false)
-    @ManyToOne(optional=false,cascade = CascadeType.ALL)
-    private Users user;
-
-    @NotNull
     private Long time;
 
     @NotNull
     private String title;
 
     @NotNull
+    @Lob
     private String text;
 
     @NotNull
     @Column(name = "view_count")
     private Integer viewCount;
+
+    @NotNull
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    @ManyToOne(optional=false,cascade = CascadeType.ALL)
+    private Users user;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
@@ -77,9 +78,9 @@ public class Posts implements Serializable {
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(name = "tag_2_post",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
+            joinColumns = @JoinColumn(name = "post_id",insertable = false, updatable = false, nullable=false),
+            inverseJoinColumns = @JoinColumn(name = "tag_id",insertable = false, updatable = false, nullable=false)
     )
-    private Set<Tags> tags ;
+    private List<Tags> tags;
 
 }

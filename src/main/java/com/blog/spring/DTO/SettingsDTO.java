@@ -1,5 +1,6 @@
 package com.blog.spring.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,10 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SettingsDTO {
 
-    private boolean MULTIUSER_MODE;
+    @JsonProperty("MULTIUSER_MODE")
+    private boolean multiUserMode;
 
-    private boolean POST_PREMODERATION;
+    @JsonProperty("POST_PREMODERATION")
+    private boolean postPreModeration;
 
-    private boolean STATISTICS_IS_PUBLIC;
+    @JsonProperty("STATISTICS_IS_PUBLIC")
+    private boolean statisticIsPublic;
 
 }

@@ -12,7 +12,7 @@ public class PostComments {
 
     @Id
     @NotNull
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "parent_id")
@@ -35,5 +35,6 @@ public class PostComments {
     private Long time;
 
     @NotNull
+    @Lob
     private String text;
 }

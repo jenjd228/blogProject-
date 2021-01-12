@@ -1,25 +1,20 @@
 package com.blog.spring.service;
 
 import com.blog.spring.DTO.*;
-import com.blog.spring.model.GlobalSettings;
-import com.blog.spring.model.Users;
-import com.blog.spring.repository.GlobalSettingsRepository;
-import com.blog.spring.repository.PostVotersRepository;
-import com.blog.spring.repository.PostsRepository;
-import com.blog.spring.repository.Tag2PostRepository;
+import com.blog.spring.model.*;
+import com.blog.spring.repository.*;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -41,7 +36,13 @@ public class GeneralService {
 
     private final PostVotersRepository postVotersRepository;
 
-    public GeneralService(PostVotersRepository postVotersRepository,ModelMapper modelMapperToStatisticDTO,AuthService authService,GlobalSettingsRepository globalSettingsRepository,ModelMapper modelMapperToTagForTagsDTO, PostsRepository postsRepository, Tag2PostRepository tag2PostRepository) {
+    private final PostCommentsRepository postCommentsRepository;
+
+    private final TagsRepository tagsRepository;
+
+    public GeneralService(TagsRepository tagsRepository,PostCommentsRepository postCommentsRepository, PostVotersRepository postVotersRepository, ModelMapper modelMapperToStatisticDTO, AuthService authService, GlobalSettingsRepository globalSettingsRepository, ModelMapper modelMapperToTagForTagsDTO, PostsRepository postsRepository, Tag2PostRepository tag2PostRepository) {
+        this.tagsRepository = tagsRepository;
+        this.postCommentsRepository = postCommentsRepository;
         this.postVotersRepository = postVotersRepository;
         this.modelMapperToStatisticDTO = modelMapperToStatisticDTO;
         this.authService = authService;
@@ -60,19 +61,16 @@ public class GeneralService {
 
         if (query == null || query.isEmpty()) {
             lists = tag2PostRepository.findTagsAndSortByCountOfPosts();
-            //tags = ((ArrayList<Tags>) tagsRepository.findAll()).stream().map(this::convertToTagForTagsDTO).collect(toList());
         } else {
             lists = tag2PostRepository.findTagsByQueryAndSortByCountOfPosts(query);
-            //tags = tagsRepository.findTagsByNameContaining(query).stream().map(this::convertToTagForTagsDTO).collect(toList());
         }
-        
+
         tags = lists.stream().map(this::convertToDto).collect(toList());
 
         if (tags.size() != 0) {
             for (TagForTagsDTO tag : tags) {
                 tag.setNormalWeight(postCount);
             }
-            //tags.sort(tagWeightComparator);
             maxWeight = tags.get(0).getWeight();
             double x = (1 / maxWeight);
 
@@ -95,43 +93,43 @@ public class GeneralService {
         return Objects.isNull(post) ? null : modelMapperToTagForTagsDTO.map(post, TagForTagsDTO.class);
     }
 
-    public CalendarDTO getCalendar(String year){
+    public CalendarDTO getCalendar(String year) {
         List<String> years = postsRepository.getCalendar();
         years.remove(null);
 
         long dateForFind1;
         long dateForFind2;
 
-        if (year == null || year.isEmpty()){
+        if (year == null || year.isEmpty()) {
 
             java.util.Calendar calendar = java.util.Calendar.getInstance(java.util.TimeZone.getDefault(), java.util.Locale.getDefault());
             calendar.setTime(new java.util.Date());
 
             String currentYear = String.valueOf(calendar.get(java.util.Calendar.YEAR));
 
-            LocalDate dateForFind = LocalDate.parse(currentYear+"-01-01");
+            LocalDate dateForFind = LocalDate.parse(currentYear + "-01-01");
 
             dateForFind1 = dateForFind.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
             dateForFind2 = dateForFind.plusYears(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 
-        }else {
-            LocalDate dateForFind = LocalDate.parse(year+"-01-01");
+        } else {
+            LocalDate dateForFind = LocalDate.parse(year + "-01-01");
 
             dateForFind1 = dateForFind.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
             dateForFind2 = dateForFind.plusYears(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 
         }
 
-        List<List<String>> posts = postsRepository.getCalendarByYear(dateForFind1,dateForFind2);
+        List<List<String>> posts = postsRepository.getCalendarByYear(dateForFind1, dateForFind2);
 
-        HashMap<String,String> postsForDTO = new HashMap<>();
+        HashMap<String, String> postsForDTO = new HashMap<>();
 
-        posts.forEach(para -> postsForDTO.put(para.get(0),para.get(1)));
+        posts.forEach(para -> postsForDTO.put(para.get(0), para.get(1)));
 
-        return new CalendarDTO(years,postsForDTO);
+        return new CalendarDTO(years, postsForDTO);
     }
 
-    public JSONObject getSettings(){
+    public JSONObject getSettings() {
         List<GlobalSettings> settingsList = globalSettingsRepository.findAll();
         JSONObject json = new JSONObject();
 
@@ -141,34 +139,147 @@ public class GeneralService {
         return json;
     }
 
-    public StatisticDTO getAllStatistics(){
+    public StatisticDTO getAllStatistics() {
         Statistics statistics = postVotersRepository.getStatistics();
-        return modelMapperToStatisticDTO.map(statistics,StatisticDTO.class);
+        return modelMapperToStatisticDTO.map(statistics, StatisticDTO.class);
     }
 
-    public StatisticDTO getMyStatistics(String sessionId){
+    public StatisticDTO getMyStatistics(String sessionId) {
         Integer id = authService.findUserIdBySession(sessionId);
         Iterable<Integer> list = postsRepository.getPostIdsByUserId(id);
         Statistics statistics = postVotersRepository.getMyStatistics(list);
 
-        return modelMapperToStatisticDTO.map(statistics,StatisticDTO.class);
+        return modelMapperToStatisticDTO.map(statistics, StatisticDTO.class);
     }
 
-    public void putSettings(){
+    public void putSettings(SettingsDTO settingsDTO) {
         String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         Users user = authService.findUserBySession(sessionId);
 
-        if (user!= null && user.getIsModerator() == 1){
-            /**
-             *insert into blog.global_settings(code,value) VALUES('MULTIUSER_MODE','NO') ON DUPLICATE KEY UPDATE value = VALUES(value);
-             * TODO
-             *
-             */
+        if (user != null && user.getIsModerator() == 1) {
+            String multiuserMode = settingsDTO.isMultiUserMode() ? "YES" : "NO";
+            String statisticsIsPublic = settingsDTO.isStatisticIsPublic() ? "YES" : "NO";
+            String postPremoderation = settingsDTO.isPostPreModeration() ? "YES" : "NO";
+            globalSettingsRepository.updateSettings(multiuserMode, statisticsIsPublic, postPremoderation);
         }
     }
 
-    public boolean isStatisticPublic(){
+    public boolean isStatisticPublic() {
         return globalSettingsRepository.isStatisticsPublic().equals("YES");
     }
 
+    public ResponseEntity<JSONObject> comment(AddCommentDTO addCommentDTO) {
+        JSONObject json = new JSONObject();
+        HashMap<String, String> errors = new HashMap<>();
+
+        if (addCommentDTO.getText().isEmpty() || addCommentDTO.getText().length() < 2){
+            json.put("result",false);
+            errors.put("text","Текст комментария не задан или слишком короткий");
+            json.put("errors",errors);
+            return new ResponseEntity<>(json, HttpStatus.OK);
+        }
+
+        Posts post = postsRepository.findPostsById(addCommentDTO.getPost_id());
+        PostComments postComments = new PostComments();
+
+        if (post != null){
+            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+            Users user = authService.findUserBySession(sessionId);
+
+            postComments.setParentId(null);
+            if (addCommentDTO.getParent_id() != null){
+                if (postCommentsRepository.findPostCommentsById(addCommentDTO.getParent_id()) != null){
+                    postComments.setParentId(addCommentDTO.getParent_id());
+                }else {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
+            postComments.setPostId(addCommentDTO.getPost_id());
+            postComments.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+            postComments.setText(addCommentDTO.getText());
+            postComments.setUserId(user.getId());
+
+            PostComments postComments1 = postCommentsRepository.save(postComments);
+
+            json.put("id",postComments1.getId());
+            return new ResponseEntity<>(json,HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+
+    public JSONObject updatePost(Integer id, AddPostDTO addPostDTO) {
+        JSONObject json = new JSONObject();
+        HashMap<String, String> errors = new HashMap<>();
+
+        List<Tags> allTagsNames = new ArrayList<>();
+
+        //String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
+        boolean result = true;
+
+        Posts post = postsRepository.findPostsById(id);
+
+        if (addPostDTO.getText().length() < 5) {
+            result = false;
+            errors.put("text", "Текст публикации слишком короткий");
+        }
+
+        if (addPostDTO.getTitle().length() < 3) {
+            result = false;
+            errors.put("title", "Заголовок слишком короткий");
+        }
+
+        json.put("result", result);
+
+        if (result) {
+
+            post.setIsActive(addPostDTO.getActive());
+            post.setModerationStatus(ModerationStatus.NEW);
+            post.setTitle(addPostDTO.getTitle());
+            post.setText(addPostDTO.getText());
+            post.setTime(Math.max(addPostDTO.getTimestamp(), LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()));
+
+            List<Tags> oldTags = post.getTags();
+            List<String> newTags  = addPostDTO.getTags();
+
+            for (String string : newTags){
+                for (Tags tag : oldTags){
+                    //if (!tag.getName().equals(string)){
+                        Tags tag1 = new Tags();
+                        tag1.setName(string.trim().toUpperCase(Locale.ROOT));
+                        allTagsNames.add(tag1);
+                   // }
+                }
+            }
+            post.setTags(allTagsNames);
+            postsRepository.save(post);
+            //List<String> oldOnlyNameTags = new ArrayList<>();
+
+           /* if (addPostDTO.getTags().size() != 0) {
+
+                for (String tag : newTags) {
+                    String trimTag = tag.trim().toUpperCase(Locale.ROOT);
+                    Tags tags = tagsRepository.findTagByName(trimTag);
+                    if (tags == null) {
+                        Tags tag1 = new Tags();
+                        tag1.setName(trimTag);
+
+                        newTagsList.add(tag1);
+                    }
+                    allTagsNames.add(trimTag);
+                }
+
+                if (newTagsList.size() != 0){
+                    post.setTags(newTagsList);
+                    postsRepository.save(post);
+                }
+            }*/
+
+            return json;
+        }
+
+        json.put("errors", errors);
+        return json;
+    }
 }

@@ -33,7 +33,7 @@ public class PostForGetByIdPost {
 
     private Integer viewCount;
 
-    private List<CommentDTO> commentList;
+    private List<CommentDTO> comments;
 
     private  List<String> tags;
 
@@ -45,7 +45,7 @@ public class PostForGetByIdPost {
 
     public void setDislikeCount(List<PostVotes> list){ this.dislikeCount = list.size(); }
 
-    public void setTags(Set<Tags> tags){
+    public void setTags(List<Tags> tags){
         if (this.tags == null){
             this.tags = new ArrayList<>();
         }

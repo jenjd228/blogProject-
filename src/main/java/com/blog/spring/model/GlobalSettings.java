@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "global_settings")
+@Table(name = "global_settings",uniqueConstraints={@UniqueConstraint(columnNames={"code"})})
 public class GlobalSettings {
 
     @Id

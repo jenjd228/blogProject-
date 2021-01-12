@@ -46,7 +46,7 @@ public class SpringConfig {
                 map().setTimestamp(source.getTime());
                 map().setActive(source.getIsActive());
                 map(source.getUser(), destination.getUser());
-                map(source.getCommentCount(), destination.getCommentList());
+                map(source.getCommentCount(), destination.getComments());
                 map().setDislikeCount(source.getDislikeVotes());
                 map().setLikeCount(source.getLikeVotes());
                 map().setTags(source.getTags());

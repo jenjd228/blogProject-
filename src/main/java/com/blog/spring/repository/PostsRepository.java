@@ -1,5 +1,6 @@
 package com.blog.spring.repository;
 
+import com.blog.spring.model.ModerationStatus;
 import com.blog.spring.model.Posts;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,12 @@ import java.util.List;
 
 @Repository
 public interface PostsRepository extends CrudRepository<Posts, Long> {
+
+    @Query("SELECT e FROM Posts e where e.isActive = ?1 AND e.userId = ?2 AND e.moderationStatus in ?3")
+    List<Posts> findPostsByUserIdAndStatus(Pageable pageable,Integer isActive,Integer userId,Iterable<ModerationStatus> status);
+
+    @Query("SELECT COUNT(*) FROM Posts e where e.isActive = ?1 AND e.userId = ?2 AND e.moderationStatus in ?3")
+    long findCountPostsByUserIdAndStatus(Integer isActive,Integer userId,Iterable<ModerationStatus> status);
 
     @Query("select e from Posts e where e.isActive = 1 AND e.moderationStatus = 'ACCEPTED' AND e.time <= ?1")
     List<Posts> findBy(Pageable pageable,Long time);
@@ -57,4 +64,11 @@ public interface PostsRepository extends CrudRepository<Posts, Long> {
 
     @Query("select e.id from Posts e where e.userId = ?1")
     List<Integer> getPostIdsByUserId(Integer userId);
+
+    @Query("SELECT e FROM Posts e where e.isActive = 1 AND e.moderationStatus = ?1 and (e.moderatorId = ?2 or e.moderatorId is null)")
+    List<Posts> findPostsByStatus(Pageable pageable, ModerationStatus status, Integer id);
+
+    @Query("SELECT COUNT(*) FROM Posts e where e.isActive = 1 AND e.moderationStatus = ?1 and (e.moderatorId = ?2 or e.moderatorId is null)")
+    long findPostsCountByStatus(ModerationStatus status, Integer id);
+
 }

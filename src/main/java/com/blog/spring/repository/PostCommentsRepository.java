@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface PostCommentsRepository extends CrudRepository<PostComments, Long> {
     @Query("SELECT COUNT(t) FROM PostComments t WHERE t.postId = ?1")
     Integer getTotalCount(Integer postId);
+
+    PostComments findPostCommentsById(Integer id);
 }

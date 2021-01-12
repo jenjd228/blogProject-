@@ -12,4 +12,6 @@ public interface TagsRepository extends CrudRepository<Tags,Integer> {
         Tags findTagByName(String name);
 
         List<Tags> findTagsByNameContaining(String query);
+
+        List<Integer> findTagsIdByNameIn(List<String> names);
 }

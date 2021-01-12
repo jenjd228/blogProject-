@@ -82,9 +82,7 @@ public class ApiGeneralController {
     @PutMapping("settings")
     public void putGlobalSettings(@RequestBody SettingsDTO settingsDTO) {
         logger.info("/api/settings - Запрос на изменение настроек блога");
-
-        System.out.println(settingsDTO.toString());
-
+        generalService.putSettings(settingsDTO);
     }
 
     @GetMapping("statistics/all")
@@ -104,5 +102,23 @@ public class ApiGeneralController {
         String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         logger.info("/api/statistics/my - Запрос на статистику блога пользователя с сессией : "+sessionId);
         return generalService.getMyStatistics(sessionId);
+    }
+
+    @PostMapping("moderation")
+    public JSONObject moderation(@RequestBody ModerationDTO moderationDTO){
+        logger.info("/moderation - Модерация поста с id : "+moderationDTO.getPost_id());
+        return postsService.moderation(moderationDTO);
+    }
+
+    @PostMapping("comment")
+    public ResponseEntity<JSONObject> comment(@RequestBody AddCommentDTO addCommentDTO){
+        logger.info("/comment - Добавление комментария к посту "+addCommentDTO.toString());
+        return generalService.comment(addCommentDTO);
+    }
+
+    @PutMapping("post/{id}")
+    public void updatePost(@PathVariable Integer id,@RequestBody AddPostDTO addPostDTO){
+        logger.info("/post/{id} - Обновление поста с id "+id+"  "+addPostDTO.toString());
+        generalService.updatePost(id,addPostDTO);
     }
 }

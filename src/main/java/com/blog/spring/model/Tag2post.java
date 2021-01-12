@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 
 @Entity
@@ -13,18 +14,20 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tag_2_post")
-public class Tag2post {
+public class Tag2post implements Serializable {
 
-    @Id
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @EmbeddedId
+    private Tag2PostKey key;
 
-    @NotNull
-    @Column(name = "post_id")
-    private Integer postId;
+    @Embeddable
+    @Data
+    public static class Tag2PostKey implements Serializable {
+        @NotNull
+        @Column(name = "post_id")
+        private Integer postId;
 
-    @NotNull
-    @Column(name = "tag_id")
-    private Integer tagId;
+        @NotNull
+        @Column(name = "tag_id")
+        private Integer tagId;
+    }
 }
