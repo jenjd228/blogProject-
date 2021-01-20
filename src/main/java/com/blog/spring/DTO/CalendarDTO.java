@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalendarDTO {
-    List<String> years;
+    private List<String> years;
 
-    HashMap<String,String> posts;
+    private HashMap<String,String> posts;
 }

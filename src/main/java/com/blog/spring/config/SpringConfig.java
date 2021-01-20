@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,12 +23,17 @@ import java.util.Properties;
 public class SpringConfig {
 
     @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public ModelMapper modelMapperToPostsDTO() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         PropertyMap<Posts, PostsDTO> propertyMap = new PropertyMap<>() {
             protected void configure() {
-                map().setAnnounce(source.getText());
+                map().setAnnounceWithoutHtml(source.getText());
                 map().setTimestamp(source.getTime());
                 map().setDislikeCount(source.getDislikeVotes());
                 map().setLikeCount(source.getLikeVotes());

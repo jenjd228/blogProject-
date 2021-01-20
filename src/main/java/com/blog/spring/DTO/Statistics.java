@@ -2,14 +2,14 @@ package com.blog.spring.DTO;
 
 public interface Statistics {
 
-    long getLikesCount();
+    Long getLikesCount();
 
-    long getDislikesCount();
+    Long getDislikesCount();
 
-    int getPostsCount();
+    Integer getPostsCount();
 
-    long getViewsCount();
+    Long getViewsCount();
 
-    long getFirstPublication();
+    Long getFirstPublication();
 
 }

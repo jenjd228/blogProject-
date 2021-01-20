@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("checkstyle:WhitespaceAfter")
 @Repository
 public interface PostCommentsRepository extends CrudRepository<PostComments, Long> {
-    @Query("SELECT COUNT(t) FROM PostComments t WHERE t.postId = ?1")
+    @Query("select count(t) from PostComments t where t.postId = ?1")
     Integer getTotalCount(Integer postId);
 
     PostComments findPostCommentsById(Integer id);

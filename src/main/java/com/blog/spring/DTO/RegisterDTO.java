@@ -1,5 +1,6 @@
 package com.blog.spring.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterDTO {
 
-    private String e_mail;
+    @JsonProperty("e_mail")
+    private String email;
 
     private String password;
 
@@ -17,6 +19,7 @@ public class RegisterDTO {
 
     private String captcha;
 
-    private String captcha_secret;
+    @JsonProperty("captcha_secret")
+    private String captchaSecret;
 
 }

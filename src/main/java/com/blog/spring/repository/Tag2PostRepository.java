@@ -11,15 +11,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface Tag2PostRepository extends CrudRepository<Tag2post,Integer> {
 
-    @Query(value = "SELECT tags.name as name, COUNT(*) as weight FROM tag_2_post JOIN" +
-            " tags ON tag_id = tags.id JOIN posts ON post_id = posts.id" +
-            " WHERE posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED'" +
-            " GROUP BY tags.id ORDER BY weight DESC;", nativeQuery = true)
+    @Query(value = "select tags.name as name, count(*) as weight from tag_2_post join" +
+            " tags on tag_id = tags.id join posts on post_id = posts.id" +
+            " where posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED'" +
+            " group by tags.id order by weight desc;", nativeQuery = true)
     List<TagNameAndWeight> findTagsAndSortByCountOfPosts();
 
-    @Query(value = "SELECT tags.name as name, COUNT(*) as weight FROM tag_2_post JOIN" +
-            " tags ON tag_id = tags.id JOIN posts ON post_id = posts.id" +
-            " WHERE posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED' AND tags.name like ?1%" +
-            " GROUP BY tags.id ORDER BY weight DESC;", nativeQuery = true)
+    @Query(value = "select tags.name as name, count(*) as weight from tag_2_post join" +
+            " tags on tag_id = tags.id join posts on post_id = posts.id" +
+            " where posts.is_active = 1 and posts.moderation_status = 'ACCEPTED' and tags.name like ?1%" +
+            " group by tags.id order by weight desc;", nativeQuery = true)
     List<TagNameAndWeight> findTagsByQueryAndSortByCountOfPosts(String query);
 }

@@ -1,8 +1,6 @@
 package com.blog.spring.controller;
 
 import com.blog.spring.DTO.*;
-import com.blog.spring.model.GlobalSettings;
-import com.blog.spring.model.PostsForResponse;
 import com.blog.spring.repository.GlobalSettingsRepository;
 import com.blog.spring.service.AuthService;
 import com.blog.spring.service.GeneralService;
@@ -13,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("init")
-    public JSONObject init() {
+    public ResponseEntity init() {
 
         logger.info("/api/init - Запрос данных инициализации");
 
@@ -49,11 +48,12 @@ public class ApiGeneralController {
         json.put("email", "mail@mail.ru");
         json.put("copyright", "Дмитрий Сергеев");
         json.put("copyrightFrom", "2005");
-        return json;
+
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @GetMapping("tag")
-    public ResponseEntity<PostsForResponse> getTags(@RequestParam(required = false) String query) {
+    public ResponseEntity getTags(@RequestParam(required = false) String query) {
         logger.info("/api/tag - Запрос на список всех тегов");
 
         JSONObject jo = new JSONObject();
@@ -65,7 +65,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("calendar")
-    public ResponseEntity<PostsForResponse> getCalendar(@RequestParam(required = false) String year) {
+    public ResponseEntity getCalendar(@RequestParam(required = false) String year) {
         logger.info("/api/calendar - Запрос на календарь " + year);
 
         CalendarDTO calendarDTO = generalService.getCalendar(year);
@@ -73,10 +73,10 @@ public class ApiGeneralController {
     }
 
     @GetMapping("settings")
-    public JSONObject getGlobalSettings() {
+    public ResponseEntity getGlobalSettings() {
         logger.info("/api/settings - Запрос на настройки блога");
 
-        return generalService.getSettings();
+        return new ResponseEntity(generalService.getSettings(), HttpStatus.OK);
     }
 
     @PutMapping("settings")
@@ -86,7 +86,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("statistics/all")
-    public ResponseEntity<StatisticDTO> getAllStatistics() {
+    public ResponseEntity getAllStatistics() {
         logger.info("/api/statistics/all - Запрос на статистику блога");
 
         if (generalService.isStatisticPublic()) {
@@ -98,27 +98,49 @@ public class ApiGeneralController {
     }
 
     @GetMapping("statistics/my")
-    public StatisticDTO getMyStatistic(){
+    public ResponseEntity getMyStatistic() {
         String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-        logger.info("/api/statistics/my - Запрос на статистику блога пользователя с сессией : "+sessionId);
-        return generalService.getMyStatistics(sessionId);
+        logger.info("/api/statistics/my - Запрос на статистику блога пользователя с сессией : " + sessionId);
+        return new ResponseEntity(generalService.getMyStatistics(sessionId), HttpStatus.OK);
     }
 
     @PostMapping("moderation")
-    public JSONObject moderation(@RequestBody ModerationDTO moderationDTO){
-        logger.info("/moderation - Модерация поста с id : "+moderationDTO.getPost_id());
-        return postsService.moderation(moderationDTO);
+    public ResponseEntity moderation(@RequestBody ModerationDTO moderationDTO) {
+        logger.info("/moderation - Модерация поста с id : " + moderationDTO.getPost_id());
+        return new ResponseEntity(postsService.moderation(moderationDTO), HttpStatus.OK);
     }
 
     @PostMapping("comment")
-    public ResponseEntity<JSONObject> comment(@RequestBody AddCommentDTO addCommentDTO){
-        logger.info("/comment - Добавление комментария к посту "+addCommentDTO.toString());
-        return generalService.comment(addCommentDTO);
+    public ResponseEntity comment(@RequestBody AddCommentDTO addCommentDTO) {
+        logger.info("/comment - Добавление комментария к посту " + addCommentDTO.toString());
+        return new ResponseEntity(generalService.comment(addCommentDTO), HttpStatus.OK);
     }
 
     @PutMapping("post/{id}")
-    public void updatePost(@PathVariable Integer id,@RequestBody AddPostDTO addPostDTO){
-        logger.info("/post/{id} - Обновление поста с id "+id+"  "+addPostDTO.toString());
-        generalService.updatePost(id,addPostDTO);
+    public void updatePost(@PathVariable Integer id, @RequestBody AddPostDTO addPostDTO) {
+        logger.info("/post/{id} - Обновление поста с id " + id + "  " + addPostDTO.toString());
+        generalService.updatePost(id, addPostDTO);
+    }
+
+    @PostMapping("profile/my")
+    public ResponseEntity updateMyProfile(@RequestBody UpdateProfileDTO updateProfileDTO){
+        logger.info("profile/my - Обновление данных о пользователе с возможным удалением фото "+updateProfileDTO.toString());
+        return new ResponseEntity(generalService.updateProfileWithoutPhoto(updateProfileDTO),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "profile/my",consumes = "multipart/form-data")
+    public @ResponseBody ResponseEntity updateMyProfileWithPhoto(UpdateProfileWithPhotoDTO updateProfileWithPhotoDTO){
+        logger.info("profile/my - Обновление данных о пользователе с фото "+updateProfileWithPhotoDTO.toString());
+        return new ResponseEntity(generalService.updateProfileWithPhoto(updateProfileWithPhotoDTO),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "image",consumes = "multipart/form-data")
+    public @ResponseBody ResponseEntity image(MultipartFile file){
+        logger.info("image - Картинка");
+        JSONObject response = generalService.image(file);
+        if (response.get("imageLocalPath") == null){
+            return new ResponseEntity(response,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(response.get("imageLocalPath"),HttpStatus.BAD_REQUEST);
     }
 }

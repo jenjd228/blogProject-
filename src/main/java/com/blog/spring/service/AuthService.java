@@ -1,6 +1,7 @@
 package com.blog.spring.service;
 
 import com.blog.spring.DTO.CaptchaDTO;
+import com.blog.spring.DTO.RegisterDTO;
 import com.blog.spring.DTO.UserLoginDTO;
 import com.blog.spring.Email.SendEmail;
 import com.blog.spring.model.CaptchaCodes;
@@ -13,6 +14,7 @@ import com.github.cage.Cage;
 import com.github.cage.GCage;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -22,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
@@ -44,9 +45,13 @@ public class AuthService {
 
     private final PostsRepository postsRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     private HashMap<String, Integer> currentUsers;
 
-    AuthService(PostsRepository postsRepository, CaptchaCodesRepository captchaCodesRepository, UserRepository userRepository, SendEmail sendEmail, ModelMapper modelMapperToUserLoginDTO) {
+
+    AuthService(PasswordEncoder passwordEncoder, PostsRepository postsRepository, CaptchaCodesRepository captchaCodesRepository, UserRepository userRepository, SendEmail sendEmail, ModelMapper modelMapperToUserLoginDTO) {
+        this.passwordEncoder = passwordEncoder;
         this.postsRepository = postsRepository;
         this.modelMapperToUserLoginDTO = modelMapperToUserLoginDTO;
         this.captchaCodesRepository = captchaCodesRepository;
@@ -64,7 +69,7 @@ public class AuthService {
         return userRepository.findUsersById(userId);
     }
 
-    public Integer findUserIdBySession(String sessionId){
+    public Integer findUserIdBySession(String sessionId) {
         return currentUsers.get(sessionId);
     }
 
@@ -107,11 +112,11 @@ public class AuthService {
         CaptchaCodes captchaCodes = new CaptchaCodes();
         captchaCodes.setCode(code);
         captchaCodes.setSecretCode(secretCode);
-        captchaCodes.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+        captchaCodes.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
 
         captchaCodesRepository.save(captchaCodes);
 
-        return new CaptchaDTO(secretCode,resultString);
+        return new CaptchaDTO(secretCode, resultString);
 
     }
 
@@ -137,40 +142,40 @@ public class AuthService {
         return dimg;
     }
 
-    public void deleteOldCaptcha(){
-        Long firstDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
-        captchaCodesRepository.removeOldCaptcha(firstDate);
-
+    public void deleteOldCaptcha() {
+        captchaCodesRepository.removeOldCaptcha(LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
     }
 
 
-    public JSONObject register(String email, String password, String name, String captcha, String captchaSecret) {
+    public JSONObject register(RegisterDTO registerDTO) {
         JSONObject json = new JSONObject();
         boolean result = true;
         HashMap<String, String> errors = new HashMap<>();
         String code = "";
-        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(captchaSecret);
+        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(registerDTO.getCaptchaSecret(), LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
 
         if (captchaCodes != null) {
             code = captchaCodes.getCode();
+        } else {
+            return null;
         }
 
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(registerDTO.getEmail()) != null) {
             result = false;
             errors.put("email", "Этот e-mail уже зарегистрирован");
         }
 
-        if (!checkPassword(password)) {
+        if (!checkPassword(registerDTO.getPassword())) {
             result = false;
             errors.put("password", "Пароль короче 6-ти символов");
         }
 
-        if (!checkName(name)) {
+        if (!checkName(registerDTO.getName())) {
             result = false;
             errors.put("name", "Имя указано неверно");
         }
 
-        if (!captcha.equals(code)) {
+        if (!registerDTO.getCaptcha().equals(code)) {
             result = false;
             errors.put("captcha", "Код с картинки введён неверно");
         }
@@ -182,12 +187,12 @@ public class AuthService {
             json.put("errors", errors);
         } else {
             Users user = new Users();
-            user.setEmail(email);
-            user.setName(name);
-            user.setPassword(String.valueOf(password.hashCode()));
-            user.setIsModerator(0);
+            user.setEmail(registerDTO.getEmail());
+            user.setName(registerDTO.getName());
+            user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+            user.setIsModerator(1);
             user.setPhoto(null);
-            user.setRegTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+            user.setRegTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
             user.setCode(null);
             userRepository.save(user);
         }
@@ -198,7 +203,7 @@ public class AuthService {
     public JSONObject password(String code, String password, String captcha, String captchaSecret) {
         JSONObject json = new JSONObject();
         Users user = userRepository.findUsersByCode(code);
-        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(captchaSecret);
+        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(captchaSecret, LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
 
         boolean result = true;
         HashMap<String, String> errors = new HashMap<>();
@@ -206,6 +211,8 @@ public class AuthService {
 
         if (captchaCodes != null) {
             codeCaptcha = captchaCodes.getCode();
+        } else {
+            return null;
         }
 
         if (user == null) {
@@ -230,7 +237,7 @@ public class AuthService {
             json.put("errors", errors);
         } else {
             user.setCode(null);
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
             userRepository.save(user);
         }
 
@@ -277,7 +284,7 @@ public class AuthService {
             return json;
         }
 
-        if (user.getPassword().equals(password)) {
+        if (passwordEncoder.matches(password, user.getPassword())) {
             json.put("result", true);
             currentUsers.put(RequestContextHolder.currentRequestAttributes().getSessionId(), user.getId());
             json.put("user", getUserLoginDTOByUserConverting(user));
@@ -307,18 +314,22 @@ public class AuthService {
     private UserLoginDTO getUserLoginDTOByUserConverting(Users user) {
         UserLoginDTO userLoginDTO = modelMapperToUserLoginDTO.map(user, UserLoginDTO.class);
         if (userLoginDTO.isModeration()) {
-            userLoginDTO.setModerationCount(postsRepository.getPostCount());
+            userLoginDTO.setModerationCount(postsRepository.getCountPostForModeration());
         } else {
             userLoginDTO.setModerationCount(0);
         }
         return userLoginDTO;
     }
 
-    public JSONObject logout(String sessionId){
-        currentUsers.remove(sessionId);
-        JSONObject json = new JSONObject();
-        json.put("result",true);
-        return json;
+    public JSONObject logout() {
+        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+        if (findUserIdBySession(sessionId) != null) {
+            currentUsers.remove(sessionId);
+            JSONObject json = new JSONObject();
+            json.put("result", true);
+            return json;
+        }
+        return null;
     }
 
 }

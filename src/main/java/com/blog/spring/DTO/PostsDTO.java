@@ -5,6 +5,9 @@ import com.blog.spring.model.PostVotes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.parser.Parser;
+import org.jsoup.safety.Whitelist;
 
 import java.util.List;
 
@@ -30,6 +33,11 @@ public class PostsDTO  {
     private Integer commentCount;
 
     private Integer viewCount;
+
+    public void setAnnounceWithoutHtml(String announceWithHtml){
+        String announceWithoutSpecialSymbols = Parser.unescapeEntities(announceWithHtml, false);
+        this.announce = Jsoup.clean(announceWithoutSpecialSymbols, Whitelist.simpleText());
+    }
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;

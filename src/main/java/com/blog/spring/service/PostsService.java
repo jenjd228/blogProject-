@@ -54,7 +54,7 @@ public class PostsService {
     }
 
     public PostsForResponse getPosts(Integer offset, Integer limit, String mode) {
-        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
+        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
         PageRequest pageable;
         List<Posts> list;
         switch (mode) {
@@ -103,15 +103,17 @@ public class PostsService {
     }
 
     public PostsForResponse getPostByDate(Integer offset, Integer limit, String date) {
-        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
+        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
 
         LocalDate dateForFind = LocalDate.parse(date);
 
-        Long dateForFind1 = dateForFind.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-        Long dateForFind2 = dateForFind.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        Long dateForFind1 = dateForFind.atStartOfDay(ZoneOffset.UTC).toInstant().getEpochSecond();
+        Long dateForFind2 = dateForFind.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().getEpochSecond();
 
         Pageable pageable = PageRequest.of(offset / limit, limit);
         List<Posts> list = new ArrayList<>(postsRepository.findByDate(pageable, currentDate, dateForFind1, dateForFind2));
+
+        System.out.println(currentDate + "   " + dateForFind1 + "   " + dateForFind2 + "     " + Arrays.toString(list.toArray()));
 
         long postCount = postsRepository.getCountFindByDate(currentDate, dateForFind1, dateForFind2);
 
@@ -132,7 +134,7 @@ public class PostsService {
         List<Integer> postIds = new ArrayList<>();
         tag2posts.forEach(tag2post -> postIds.add(tag2post.getKey().getPostId()));
 
-        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
+        Long currentDate = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
 
         long postCount = postsRepository.getCountFindByIds(currentDate, postIds);
 
@@ -171,8 +173,7 @@ public class PostsService {
         Integer userId = authService.findUserIdBySession(sessionID);
 
         if (userId == null) {
-            json.put("result", false);
-            return json;
+            return null;
         }
 
         PostVotes postVotesFromBd = postVotersRepository.getPostVotesByUserIdAndPostId(postId, userId);
@@ -182,7 +183,7 @@ public class PostsService {
             postVotes.setPostId(postId);
             postVotes.setUserId(userId);
             postVotes.setValue(likeOrDislike);
-            postVotes.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+            postVotes.setTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
             postVotersRepository.save(postVotes);
             json.put("result", true);
             return json;
@@ -198,62 +199,52 @@ public class PostsService {
     }
 
     public JSONObject addPost(AddPostDTO addPostDTO) {
-        JSONObject json = new JSONObject();
-        HashMap<String, String> errors = new HashMap<>();
-
-        List<Tags> newTagsList = new ArrayList<>();
-
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
-        boolean result = true;
+        Integer userId = authService.findUserIdBySession(sessionID);
 
-        if (addPostDTO.getText().length() < 5) {
-            result = false;
-            errors.put("text", "Текст публикации слишком короткий");
-        }
+        if (userId != null) {
+            JSONObject json = new JSONObject();
+            HashMap<String, String> errors = new HashMap<>();
 
-        if (addPostDTO.getTitle().length() < 3) {
-            result = false;
-            errors.put("title", "Заголовок не установлен");
-        }
+            boolean result = true;
 
-        json.put("result", result);
-
-        if (result) {
-            Posts newPost = new Posts();
-            Integer userId = authService.findUserIdBySession(sessionID);
-
-            newPost.setViewCount(0);
-            newPost.setIsActive(addPostDTO.getActive());
-            newPost.setModerationStatus(ModerationStatus.NEW);
-            newPost.setTitle(addPostDTO.getTitle());
-            newPost.setText(addPostDTO.getText());
-            newPost.setTime(Math.max(addPostDTO.getTimestamp(), LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()));
-            newPost.setUserId(userId);
-
-            if (addPostDTO.getTags().size() != 0) {
-
-                for (String tag : addPostDTO.getTags()) {
-                    String trimTag = tag.trim();
-                    Tags tags = tagsRepository.findTagByName(trimTag);
-                    if (tags == null) {
-                        Tags tag1 = new Tags();
-                        tag1.setName(trimTag.toUpperCase(Locale.ROOT));
-
-                        newTagsList.add(tag1);
-                    }
-                }
-
-                if (newTagsList.size() != 0){
-                    newPost.setTags(newTagsList);
-                    postsRepository.save(newPost);
-                }
+            if (addPostDTO.getText().length() < 5) {
+                result = false;
+                errors.put("text", "Текст публикации слишком короткий");
             }
 
+            if (addPostDTO.getTitle().length() < 3) {
+                result = false;
+                errors.put("title", "Заголовок не установлен");
+            }
+
+            json.put("result", result);
+
+            if (result) {
+                Posts newPost = new Posts();
+
+                newPost.setViewCount(0);
+                newPost.setIsActive(addPostDTO.getActive());
+                newPost.setModerationStatus(ModerationStatus.NEW);
+                newPost.setTitle(addPostDTO.getTitle());
+                newPost.setText(addPostDTO.getText());
+                newPost.setTime(Math.max(addPostDTO.getTimestamp(), LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond()));
+                newPost.setUserId(userId);
+
+                if (addPostDTO.getTags().size() != 0) {
+                    addPostDTO.getTags().forEach(tagsRepository::saveIgnoreDuplicateKey);
+                    newPost.setTags(tagsRepository.findTagsIdByNameIn(addPostDTO.getTags()));
+                }
+                postsRepository.save(newPost);
+
+                return json;
+            }
+
+
+            json.put("errors", errors);
             return json;
         }
-
-        json.put("errors", errors);
-        return json;
+        return null;
     }
 
     public JSONObject moderation(ModerationDTO moderationDTO) {
@@ -262,82 +253,93 @@ public class PostsService {
         Users user = authService.findUserBySession(sessionID);
         Posts post = postsRepository.findPostsById(moderationDTO.getPost_id());
 
-        if (user.getIsModerator() == 1 && post != null){
-            json.put("result",true);
+        if (user == null) {
+            return null;
+        }
+
+        if (user.getIsModerator() == 1 && post != null) {
+            json.put("result", true);
             post.setModeratorId(user.getId());
-            if (moderationDTO.getDecision().equals("accept")){
+            if (moderationDTO.getDecision().equals("accept")) {
                 post.setModerationStatus(ModerationStatus.ACCEPTED);
-            }else {
+            } else {
                 post.setModerationStatus(ModerationStatus.DECLINED);
             }
             postsRepository.save(post);
             return json;
         }
-        json.put("result",false);
+        json.put("result", false);
         return json;
     }
 
     public PostsForResponse getPostsForModeration(Integer offset, Integer limit, String status) {
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
-        Integer id = authService.findUserIdBySession(sessionID);
-        PageRequest pageable = PageRequest.of(offset / limit, limit);
-        List<Posts> list;
-        long postCount;
+        Integer userId = authService.findUserIdBySession(sessionID);
 
-        switch (status){
-            case "new" ->{
-                list = postsRepository.findPostsByStatus(pageable,ModerationStatus.NEW,id);
-                postCount = postsRepository.findPostsCountByStatus(ModerationStatus.NEW,id);
-            }
-            case "declined" ->{
-                list = postsRepository.findPostsByStatus(pageable,ModerationStatus.DECLINED,id);
-                postCount = postsRepository.findPostsCountByStatus(ModerationStatus.DECLINED,id);
+        if (userId != null){
+            PageRequest pageable = PageRequest.of(offset / limit, limit);
+            List<Posts> list;
+            long postCount;
 
+            switch (status) {
+                case "new" -> {
+                    list = postsRepository.findPostsByStatus(pageable, ModerationStatus.NEW, userId);
+                    postCount = postsRepository.findPostsCountByStatus(ModerationStatus.NEW, userId);
+                }
+                case "declined" -> {
+                    list = postsRepository.findPostsByStatus(pageable, ModerationStatus.DECLINED, userId);
+                    postCount = postsRepository.findPostsCountByStatus(ModerationStatus.DECLINED, userId);
+
+                }
+                case "accepted" -> {
+                    list = postsRepository.findPostsByStatus(pageable, ModerationStatus.ACCEPTED, userId);
+                    postCount = postsRepository.findPostsCountByStatus(ModerationStatus.ACCEPTED, userId);
+                }
+                default -> {
+                    list = new ArrayList<>();
+                    postCount = 0;
+                }
             }
-            case "accepted" ->{
-                list = postsRepository.findPostsByStatus(pageable,ModerationStatus.ACCEPTED,id);
-                postCount = postsRepository.findPostsCountByStatus(ModerationStatus.ACCEPTED,id);
-            }
-            default -> {
-                list = new ArrayList<>();
-                postCount = 0;
-            }
+            List<PostsDTO> postsDTOS = list.stream().map(this::convertToDto).collect(toList());
+
+            return new PostsForResponse(postsDTOS, postCount);
         }
-        List<PostsDTO> postsDTOS = list.stream().map(this::convertToDto).collect(toList());
-
-        return new PostsForResponse(postsDTOS,postCount);
+        return null;
     }
 
-    public PostsForResponse my(Integer offset,Integer limit,String status) {
-        PageRequest pageable = PageRequest.of(offset / limit, limit);
+    public PostsForResponse my(Integer offset, Integer limit, String status) {
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
-        Integer id = authService.findUserIdBySession(sessionID);
-        List<ModerationStatus> moderationStatusList = new ArrayList<>();
-        int isActive = 1;
+        Integer userId = authService.findUserIdBySession(sessionID);
+        if (userId != null){
+            PageRequest pageable = PageRequest.of(offset / limit, limit);
+            List<ModerationStatus> moderationStatusList = new ArrayList<>();
+            int isActive = 1;
 
-        switch (status){
-            case "pending"->{
-                moderationStatusList.add(ModerationStatus.NEW);
+            switch (status) {
+                case "pending" -> {
+                    moderationStatusList.add(ModerationStatus.NEW);
+                }
+                case "declined" -> {
+                    moderationStatusList.add(ModerationStatus.DECLINED);
+                }
+                case "published" -> {
+                    moderationStatusList.add(ModerationStatus.ACCEPTED);
+                }
+                default -> {
+                    isActive = 0;
+                    moderationStatusList.add(ModerationStatus.ACCEPTED);
+                    moderationStatusList.add(ModerationStatus.NEW);
+                    moderationStatusList.add(ModerationStatus.DECLINED);
+                }
             }
-            case "declined"->{
-                moderationStatusList.add(ModerationStatus.DECLINED);
-            }
-            case "published"->{
-                moderationStatusList.add(ModerationStatus.ACCEPTED);
-            }
-            default -> {
-                isActive = 0;
-                moderationStatusList.add(ModerationStatus.ACCEPTED);
-                moderationStatusList.add(ModerationStatus.NEW);
-                moderationStatusList.add(ModerationStatus.DECLINED);
-            }
+
+            List<Posts> posts = postsRepository.findPostsByUserIdAndStatus(pageable, isActive, userId, moderationStatusList);
+
+            List<PostsDTO> postsDTOS = posts.stream().map(this::convertToDto).collect(toList());
+            long postsCount = postsRepository.findCountPostsByUserIdAndStatus(isActive, userId, moderationStatusList);
+
+            return new PostsForResponse(postsDTOS, postsCount);
         }
-
-        List<Posts> posts = postsRepository.findPostsByUserIdAndStatus(pageable,isActive,id,moderationStatusList);
-
-        List<PostsDTO> postsDTOS = posts.stream().map(this::convertToDto).collect(toList());
-        long postsCount = postsRepository.findCountPostsByUserIdAndStatus(isActive,id,moderationStatusList);
-
-        return new PostsForResponse(postsDTOS,postsCount);
+        return null;
     }
 }

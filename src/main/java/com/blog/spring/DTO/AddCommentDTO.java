@@ -1,5 +1,6 @@
 package com.blog.spring.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddCommentDTO {
 
-    private Integer parent_id;
+    @JsonProperty("parent_id")
+    private Integer parentId;
 
-    private Integer post_id;
+    @JsonProperty("post_id")
+    private Integer postId;
 
     private String text;
 }

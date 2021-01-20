@@ -11,10 +11,11 @@ import javax.transaction.Transactional;
 @Repository
 public interface CaptchaCodesRepository extends CrudRepository<CaptchaCodes,Long> {
 
-    CaptchaCodes findCaptchaCodesBySecretCode(String secretCode);
+    @Query("select e from CaptchaCodes e where ?2 < e.time+3600 and e.secretCode = ?1")
+    CaptchaCodes findCaptchaCodesBySecretCode(String secretCode,Long time);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from captcha_codes where captcha_codes.time < ?1 AND captcha_codes.id > 0;",nativeQuery = true)
-    void removeOldCaptcha(Long firstDate);
+    @Query(value = "delete from captcha_codes where ?1 > captcha_codes.time+3600 and captcha_codes.id > 0;",nativeQuery = true)
+    void removeOldCaptcha(Long time);
 }

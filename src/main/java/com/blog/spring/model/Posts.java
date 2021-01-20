@@ -76,7 +76,7 @@ public class Posts implements Serializable {
     @JoinColumn(name = "post_id")
     private List<PostComments> commentCount;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = { CascadeType.MERGE })
     @JoinTable(name = "tag_2_post",
             joinColumns = @JoinColumn(name = "post_id",insertable = false, updatable = false, nullable=false),
             inverseJoinColumns = @JoinColumn(name = "tag_id",insertable = false, updatable = false, nullable=false)

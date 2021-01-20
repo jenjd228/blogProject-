@@ -29,6 +29,7 @@ public class Users {
     @NotNull
     private String email;
 
+    @Lob
     @NotNull
     private String password;
 
