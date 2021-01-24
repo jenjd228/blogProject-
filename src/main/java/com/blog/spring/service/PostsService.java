@@ -4,10 +4,7 @@ import com.blog.spring.DTO.AddPostDTO;
 import com.blog.spring.DTO.ModerationDTO;
 import com.blog.spring.DTO.PostsDTO;
 import com.blog.spring.model.*;
-import com.blog.spring.repository.PostVotersRepository;
-import com.blog.spring.repository.PostsRepository;
-import com.blog.spring.repository.Tag2PostRepository;
-import com.blog.spring.repository.TagsRepository;
+import com.blog.spring.repository.*;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,13 +34,16 @@ public class PostsService {
 
     private final TagsRepository tagsRepository;
 
+    private final GlobalSettingsRepository globalSettingsRepository;
+
     private final Tag2PostRepository tag2PostRepository;
 
     private final AuthService authService;
 
     private final PostVotersRepository postVotersRepository;
 
-    public PostsService(PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
+    public PostsService(GlobalSettingsRepository globalSettingsRepository, PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
+        this.globalSettingsRepository = globalSettingsRepository;
         this.postVotersRepository = postVotersRepository;
         this.authService = authService;
         this.modelMapperForByIdPost = modelMapperForByIdPost;
@@ -83,6 +83,7 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
+        post.getUser().setPhoto("http://localhost:8080/"+post.getUser().getPhoto());
         return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 
@@ -225,7 +226,11 @@ public class PostsService {
 
                 newPost.setViewCount(0);
                 newPost.setIsActive(addPostDTO.getActive());
-                newPost.setModerationStatus(ModerationStatus.NEW);
+                if (globalSettingsRepository.isPOST_PREMODERATION().equals("YES")) {
+                    newPost.setModerationStatus(ModerationStatus.ACCEPTED);
+                } else {
+                    newPost.setModerationStatus(ModerationStatus.NEW);
+                }
                 newPost.setTitle(addPostDTO.getTitle());
                 newPost.setText(addPostDTO.getText());
                 newPost.setTime(Math.max(addPostDTO.getTimestamp(), LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond()));
@@ -276,7 +281,7 @@ public class PostsService {
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
         Integer userId = authService.findUserIdBySession(sessionID);
 
-        if (userId != null){
+        if (userId != null) {
             PageRequest pageable = PageRequest.of(offset / limit, limit);
             List<Posts> list;
             long postCount;
@@ -310,7 +315,7 @@ public class PostsService {
     public PostsForResponse my(Integer offset, Integer limit, String status) {
         String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
         Integer userId = authService.findUserIdBySession(sessionID);
-        if (userId != null){
+        if (userId != null) {
             PageRequest pageable = PageRequest.of(offset / limit, limit);
             List<ModerationStatus> moderationStatusList = new ArrayList<>();
             int isActive = 1;

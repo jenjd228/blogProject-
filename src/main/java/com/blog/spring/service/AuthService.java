@@ -190,7 +190,7 @@ public class AuthService {
             user.setEmail(registerDTO.getEmail());
             user.setName(registerDTO.getName());
             user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-            user.setIsModerator(1);
+            user.setIsModerator(0);
             user.setPhoto(null);
             user.setRegTime(LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
             user.setCode(null);
@@ -317,6 +317,9 @@ public class AuthService {
             userLoginDTO.setModerationCount(postsRepository.getCountPostForModeration());
         } else {
             userLoginDTO.setModerationCount(0);
+        }
+        if (userLoginDTO.getPhoto() != null) {
+            userLoginDTO.setPhoto("http://localhost:8080/" + userLoginDTO.getPhoto());
         }
         return userLoginDTO;
     }

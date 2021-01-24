@@ -35,8 +35,7 @@ public class PostsDTO  {
     private Integer viewCount;
 
     public void setAnnounceWithoutHtml(String announceWithHtml){
-        String announceWithoutSpecialSymbols = Parser.unescapeEntities(announceWithHtml, false);
-        this.announce = Jsoup.clean(announceWithoutSpecialSymbols, Whitelist.simpleText());
+        this.announce = announceWithHtml.replaceAll("<.+?>", "").replaceAll("(\\s)+", "$1");
     }
 
     public void setTimestamp(Long timestamp) {

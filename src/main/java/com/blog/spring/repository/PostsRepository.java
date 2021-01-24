@@ -59,11 +59,8 @@ public interface PostsRepository extends CrudRepository<Posts, Long> {
     @Query("select distinct date_format(from_unixtime(time), '%Y') from Posts")
     List<String> getCalendar();
 
-    @Query(value = "select time, count(time) as count from ( select date_format(from_unixtime(time), '%Y-%m-%d') as time from Posts where time >= ?1 and time < ?2 and moderation_status = 'ACCEPTED' ) as t group by time", nativeQuery = true)
+    @Query(value = "select time, count(time) as count from ( select date_format(from_unixtime(time), '%Y-%m-%d') as time from posts where time >= ?1 and time < ?2 and moderation_status = 'ACCEPTED' ) as t group by time", nativeQuery = true)
     List<List<String>> getCalendarByYear(Long fromDate, Long toDate);
-
-    @Query("select e.id from Posts e where e.userId = ?1")
-    List<Integer> getPostIdsByUserId(Integer userId);
 
     @Query("select e from Posts e where e.isActive = 1 and e.moderationStatus = ?1 and (e.moderatorId = ?2 or e.moderatorId is null)")
     List<Posts> findPostsByStatus(Pageable pageable, ModerationStatus status, Integer id);

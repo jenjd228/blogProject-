@@ -24,8 +24,8 @@ public interface PostVotersRepository extends CrudRepository<PostVotes, Integer>
             "(select count(*) where pv.value = -1) as dislikesCount, " +
             "sum(p.view_count) as viewsCount, " +
             "min(p.time) as firstPublication " +
-            "from posts p left join post_voters pv on pv.post_id = p.id where p.user_id = 1",nativeQuery = true)
-    Statistics getMyStatistics();
+            "from posts p left join post_voters pv on pv.post_id = p.id where p.user_id = ?1",nativeQuery = true)
+    Statistics getMyStatistics(Integer id);
 
     @Query(value = "select e from PostVotes e where e.postId = ?1 and e.userId = ?2")
     PostVotes getPostVotesByUserIdAndPostId(Integer postId, Integer userId);

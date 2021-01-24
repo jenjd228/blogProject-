@@ -165,9 +165,12 @@ public class GeneralService {
 
     public StatisticDTO getMyStatistics(String sessionId) {
         Integer id = authService.findUserIdBySession(sessionId);
-        Statistics statistics = postVotersRepository.getMyStatistics();
+        if (id != null){
+            Statistics statistics = postVotersRepository.getMyStatistics(id);
 
-        return modelMapperToStatisticDTO.map(statistics, StatisticDTO.class);
+            return modelMapperToStatisticDTO.map(statistics, StatisticDTO.class);
+        }
+        return null;
     }
 
     public void putSettings(SettingsDTO settingsDTO) {
@@ -288,11 +291,15 @@ public class GeneralService {
             if (!checkName(updateProfileDTO.getName())) {
                 result = false;
                 errors.put("name", "Имя указано неверно");
+            }else {
+                user.setName(updateProfileDTO.getName());
             }
 
             if (!user.getEmail().equals(updateProfileDTO.getEmail()) && userRepository.findByEmail(updateProfileDTO.getEmail()) != null) {
                 result = false;
                 errors.put("email", "Этот e-mail уже зарегистрирован");
+            }else {
+                user.setEmail(updateProfileDTO.getEmail());
             }
 
             if (updateProfileDTO.getPassword() != null && !updateProfileDTO.getPassword().isEmpty() && !passwordEncoder.matches(updateProfileDTO.getPassword(), user.getPassword())) {
@@ -304,12 +311,8 @@ public class GeneralService {
                 }
             }
 
-            if (updateProfileDTO.getRemovePhoto() == 1){
+            if (updateProfileDTO.getRemovePhoto() != null && updateProfileDTO.getRemovePhoto() == 1){
                 File file = new File(user.getPhoto());
-                System.out.println(file.getPath());
-                System.out.println(file.getAbsolutePath());
-                System.out.println(file.getName());
-                System.out.println(file.exists());
                 if (file.exists()) {
                     try {
                         FileUtils.forceDelete(file);
@@ -317,15 +320,12 @@ public class GeneralService {
                         e.printStackTrace();
                     }
                 }
-                System.out.println(file.exists());
                 user.setPhoto(null);
             }
 
             json.put("result", result);
 
             if (result) {
-                user.setEmail(updateProfileDTO.getEmail());
-                user.setName(updateProfileDTO.getName());
                 userRepository.save(user);
                 return json;
             }
@@ -404,7 +404,7 @@ public class GeneralService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            json.put("imageLocalPath", imageLocalPath);
+            json.put("imageLocalPath", "http://localhost:8080/"+imageLocalPath);
             return json;
         }
         return null;

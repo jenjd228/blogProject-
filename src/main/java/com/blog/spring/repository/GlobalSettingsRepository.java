@@ -18,6 +18,9 @@ public interface GlobalSettingsRepository extends CrudRepository<GlobalSettings,
     @Query("select e.value from GlobalSettings e where e.code = 'STATISTICS_IS_PUBLIC'")
     String isStatisticsPublic();
 
+    @Query("select e.value from GlobalSettings e where e.code = 'POST_PREMODERATION'")
+    String isPOST_PREMODERATION();
+
     @Transactional
     @Modifying
     @Query(value = "insert into global_settings(code,value) values ('MULTIUSER_MODE',?1),('STATISTICS_IS_PUBLIC',?2),('POST_PREMODERATION',?3) on duplicate key update value = values(value);",nativeQuery = true)
