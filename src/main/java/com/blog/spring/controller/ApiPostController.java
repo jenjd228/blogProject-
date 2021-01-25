@@ -60,14 +60,14 @@ public class ApiPostController {
     public ResponseEntity getPost(@PathVariable Integer id) {
         logger.info("/{id} - Запрос данных поста по id : " + id);
 
+        String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
+
+        postsService.addViewToPostIfNotModeratorAndWriter(id, sessionID);
+
         PostForGetByIdPost post = postsService.getPostById(id);
         if (post == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
-
-        postsService.addViewToPostIfNotModeratorAndWriter(id, sessionID);
 
         return new ResponseEntity(post, HttpStatus.OK);
     }

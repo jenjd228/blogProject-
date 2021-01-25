@@ -14,6 +14,7 @@ import com.github.cage.Cage;
 import com.github.cage.GCage;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -24,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
@@ -49,6 +51,8 @@ public class AuthService {
 
     private HashMap<String, Integer> currentUsers;
 
+    @Value("${server.port}")
+    private String port;
 
     AuthService(PasswordEncoder passwordEncoder, PostsRepository postsRepository, CaptchaCodesRepository captchaCodesRepository, UserRepository userRepository, SendEmail sendEmail, ModelMapper modelMapperToUserLoginDTO) {
         this.passwordEncoder = passwordEncoder;
@@ -196,7 +200,6 @@ public class AuthService {
             user.setCode(null);
             userRepository.save(user);
         }
-        // что делать с капчей после успешной регистрации
         return json;
     }
 
@@ -252,7 +255,7 @@ public class AuthService {
     }
 
     private boolean checkName(String name) {
-        String namePattern = "^[a-zа-яA-ZА-Я]+$";
+        String namePattern = "^[a-zа-яA-ZА-ЯёЁ]+$";
         Pattern pattern = Pattern.compile(namePattern);
         Matcher matcher = pattern.matcher(name);
         return matcher.find();
@@ -319,7 +322,7 @@ public class AuthService {
             userLoginDTO.setModerationCount(0);
         }
         if (userLoginDTO.getPhoto() != null) {
-            userLoginDTO.setPhoto("http://localhost:8080/" + userLoginDTO.getPhoto());
+            userLoginDTO.setPhoto("http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port+"/" + userLoginDTO.getPhoto());
         }
         return userLoginDTO;
     }

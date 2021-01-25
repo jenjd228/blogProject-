@@ -7,13 +7,17 @@ import com.blog.spring.model.*;
 import com.blog.spring.repository.*;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -41,6 +45,9 @@ public class PostsService {
     private final AuthService authService;
 
     private final PostVotersRepository postVotersRepository;
+
+    @Value("${server.port}")
+    private String port;
 
     public PostsService(GlobalSettingsRepository globalSettingsRepository, PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
         this.globalSettingsRepository = globalSettingsRepository;
@@ -83,7 +90,7 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
-        post.getUser().setPhoto("http://localhost:8080/"+post.getUser().getPhoto());
+        post.getUser().setPhoto("http://"+InetAddress.getLoopbackAddress().getHostName()+":"+port+"/"+post.getUser().getPhoto());
         return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 
@@ -227,9 +234,9 @@ public class PostsService {
                 newPost.setViewCount(0);
                 newPost.setIsActive(addPostDTO.getActive());
                 if (globalSettingsRepository.isPOST_PREMODERATION().equals("YES")) {
-                    newPost.setModerationStatus(ModerationStatus.ACCEPTED);
-                } else {
                     newPost.setModerationStatus(ModerationStatus.NEW);
+                } else {
+                    newPost.setModerationStatus(ModerationStatus.ACCEPTED);
                 }
                 newPost.setTitle(addPostDTO.getTitle());
                 newPost.setText(addPostDTO.getText());

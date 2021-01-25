@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -57,6 +59,9 @@ public class GeneralService {
     private final TagsRepository tagsRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${server.port}")
+    private String port;
 
     public GeneralService(PasswordEncoder passwordEncoder, UserRepository userRepository, TagsRepository tagsRepository, PostCommentsRepository postCommentsRepository, PostVotersRepository postVotersRepository, ModelMapper modelMapperToStatisticDTO, AuthService authService, GlobalSettingsRepository globalSettingsRepository, ModelMapper modelMapperToTagForTagsDTO, PostsRepository postsRepository, Tag2PostRepository tag2PostRepository) {
         this.passwordEncoder = passwordEncoder;
@@ -404,7 +409,7 @@ public class GeneralService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            json.put("imageLocalPath", "http://localhost:8080/"+imageLocalPath);
+            json.put("imageLocalPath", "http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port+"/"+imageLocalPath);
             return json;
         }
         return null;
