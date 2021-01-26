@@ -121,8 +121,6 @@ public class PostsService {
         Pageable pageable = PageRequest.of(offset / limit, limit);
         List<Posts> list = new ArrayList<>(postsRepository.findByDate(pageable, currentDate, dateForFind1, dateForFind2));
 
-        System.out.println(currentDate + "   " + dateForFind1 + "   " + dateForFind2 + "     " + Arrays.toString(list.toArray()));
-
         long postCount = postsRepository.getCountFindByDate(currentDate, dateForFind1, dateForFind2);
 
         List<PostsDTO> postsDTOS = list.stream().map(this::convertToDto).collect(toList());

@@ -12,7 +12,6 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -32,7 +31,7 @@ public class Posts implements Serializable {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "moderation_status",nullable = false, columnDefinition =  "enum('NEW','ACCEPTED','DECLINED')")
+    @Column(name = "moderation_status", nullable = false, columnDefinition = "enum('NEW','ACCEPTED','DECLINED')")
     private ModerationStatus moderationStatus;
 
     @Column(name = "moderator_id")
@@ -57,17 +56,17 @@ public class Posts implements Serializable {
     private Integer viewCount;
 
     @NotNull
-    @JoinColumn(name = "user_id", insertable=false, updatable=false)
-    @ManyToOne(optional=false,cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private Users user;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = -1")
     private List<PostVotes> dislikeVotes;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable=false, updatable=false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = 1")
     @LazyCollection(LazyCollectionOption.EXTRA)
     private List<PostVotes> likeVotes;
@@ -76,10 +75,10 @@ public class Posts implements Serializable {
     @JoinColumn(name = "post_id")
     private List<PostComments> commentCount;
 
-    @ManyToMany(cascade = { CascadeType.MERGE })
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(name = "tag_2_post",
-            joinColumns = @JoinColumn(name = "post_id",insertable = false, updatable = false, nullable=false),
-            inverseJoinColumns = @JoinColumn(name = "tag_id",insertable = false, updatable = false, nullable=false)
+            joinColumns = @JoinColumn(name = "post_id", insertable = false, updatable = false, nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", insertable = false, updatable = false, nullable = false)
     )
     private List<Tags> tags;
 
