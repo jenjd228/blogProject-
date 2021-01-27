@@ -12,7 +12,8 @@ public interface PostVotersRepository extends CrudRepository<PostVotes, Integer>
     @Query("select count(t) from PostVotes t where t.postId = ?1 and t.value = ?2")
     Integer getLikeOrDislikeCount(Integer postId, Integer value);
 
-    @Query(value = "select count(*) as likesCount,(select count(*) from post_voters where value = -1) as dislikesCount," +
+    @Query(value = "select count(*) as likesCount," +
+            " (select count(*) from post_voters where value = -1) as dislikesCount," +
             " (select count(*) from posts) as postsCount," +
             " (select sum(posts.view_count) from posts) as viewsCount," +
             " (select min(posts.time) from posts) as firstPublication" +
@@ -29,10 +30,10 @@ public interface PostVotersRepository extends CrudRepository<PostVotes, Integer>
     Statistics getMyStatistics(Integer id);*/
 
     @Query(value = "select count(*) as likesCount," +
-            "(select count(*) from post_voters join blog.posts on post_voters.post_id = blog.posts.id where value = -1 and blog.posts.user_id = ?1) as dislikesCount, " +
-            "(select COUNT(*) from posts where posts.user_id = ?1) as postsCount, " +
-            "(select sum(posts.view_count) from posts where posts.user_id = ?1) as viewsCount, " +
-            "(select min(posts.time) from posts where posts.user_id = ?1) as firstPublication from post_voters join posts on post_voters.post_id = posts.id where value = 1 and posts.user_id = ?1;",nativeQuery = true)
+            " (select count(*) from post_voters join posts on post_voters.post_id = posts.id where value = -1 and posts.user_id = ?1) as dislikesCount," +
+            " (select count(*) from posts where posts.user_id = ?1) as postsCount," +
+            " (select sum(posts.view_count) from posts where posts.user_id = ?1) as viewsCount," +
+            " (select min(posts.time) from posts where posts.user_id = ?1) as firstPublication from post_voters join posts on post_voters.post_id = posts.id where value = 1 and posts.user_id = ?1 ;",nativeQuery = true)
     Statistics getMyStatistics(Integer id);
 
     @Query(value = "select e from PostVotes e where e.postId = ?1 and e.userId = ?2")
