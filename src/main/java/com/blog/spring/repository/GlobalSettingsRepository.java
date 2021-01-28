@@ -23,6 +23,6 @@ public interface GlobalSettingsRepository extends CrudRepository<GlobalSettings,
 
     @Transactional
     @Modifying
-    @Query(value = "insert into global_settings(code,value) values ('MULTIUSER_MODE',?1),('STATISTICS_IS_PUBLIC',?2),('POST_PREMODERATION',?3) on duplicate key update value = values(value);",nativeQuery = true)
-    void updateSettings(String multiuserMode,String statisticsIsPublic,String postPremoderation);
+    @Query(value = "insert into global_settings(code,value) values ('MULTIUSER_MODE',?1),('STATISTICS_IS_PUBLIC',?2),('POST_PREMODERATION',?3) on duplicate key update value = values(value);", nativeQuery = true)
+    void updateSettings(String multiuserMode, String statisticsIsPublic, String postPremoderation);
 }

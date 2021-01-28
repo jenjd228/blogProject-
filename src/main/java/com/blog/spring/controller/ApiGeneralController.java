@@ -135,7 +135,7 @@ public class ApiGeneralController {
     }
 
     @PostMapping(value = "image",consumes = "multipart/form-data")
-    public @ResponseBody ResponseEntity image(MultipartFile file){
+    public ResponseEntity image(@RequestParam("image") MultipartFile file){
         logger.info("image - Картинка");
         JSONObject response = generalService.image(file);
         if (response.get("imageLocalPath") == null){

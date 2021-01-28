@@ -322,7 +322,7 @@ public class AuthService {
             userLoginDTO.setModerationCount(0);
         }
         if (userLoginDTO.getPhoto() != null) {
-            userLoginDTO.setPhoto("http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port+"/" + userLoginDTO.getPhoto());
+            userLoginDTO.setPhoto("http://" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + userLoginDTO.getPhoto());
         }
         return userLoginDTO;
     }

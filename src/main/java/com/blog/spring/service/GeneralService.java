@@ -17,10 +17,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.mail.internet.InternetAddress;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -170,7 +172,7 @@ public class GeneralService {
 
     public StatisticDTO getMyStatistics(String sessionId) {
         Integer id = authService.findUserIdBySession(sessionId);
-        if (id != null){
+        if (id != null) {
             Statistics statistics = postVotersRepository.getMyStatistics(id);
 
             return modelMapperToStatisticDTO.map(statistics, StatisticDTO.class);
@@ -296,14 +298,14 @@ public class GeneralService {
             if (!checkName(updateProfileDTO.getName())) {
                 result = false;
                 errors.put("name", "Имя указано неверно");
-            }else {
+            } else {
                 user.setName(updateProfileDTO.getName());
             }
 
             if (!user.getEmail().equals(updateProfileDTO.getEmail()) && userRepository.findByEmail(updateProfileDTO.getEmail()) != null) {
                 result = false;
                 errors.put("email", "Этот e-mail уже зарегистрирован");
-            }else {
+            } else {
                 user.setEmail(updateProfileDTO.getEmail());
             }
 
@@ -311,12 +313,12 @@ public class GeneralService {
                 if (!checkPassword(updateProfileDTO.getPassword())) {
                     result = false;
                     errors.put("password", "Пароль короче 6-ти символов");
-                }else {
+                } else {
                     user.setPassword(passwordEncoder.encode(updateProfileDTO.getPassword()));
                 }
             }
 
-            if (updateProfileDTO.getRemovePhoto() != null && updateProfileDTO.getRemovePhoto() == 1){
+            if (updateProfileDTO.getRemovePhoto() != null && updateProfileDTO.getRemovePhoto() == 1) {
                 File file = new File(user.getPhoto());
                 if (file.exists()) {
                     try {
@@ -395,8 +397,8 @@ public class GeneralService {
             String second = random.substring(2, 4);
             String third = random.substring(4, 6);
 
-            String dirStr = "upload\\" + first + "\\" + second + "\\" + third;
-            String imageLocalPath = dirStr + "\\" + file.getOriginalFilename();
+            String dirStr = "upload/" + first + "/" + second + "/" + third;
+            String imageLocalPath = dirStr + "/" + file.getOriginalFilename();
             File dir = new File(dirStr);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -409,7 +411,7 @@ public class GeneralService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            json.put("imageLocalPath", "http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port+"/"+imageLocalPath);
+            json.put("imageLocalPath", "http//" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + imageLocalPath);
             return json;
         }
         return null;
@@ -450,7 +452,6 @@ public class GeneralService {
             }
 
 
-
             if (updateProfileWithPhotoDTO.getRemovePhoto() != 1) {
 
                 String resultImagePath = getPathIfSuccess(updateProfileWithPhotoDTO.getPhoto());
@@ -468,7 +469,6 @@ public class GeneralService {
             if (result) {
                 user.setEmail(updateProfileWithPhotoDTO.getEmail());
                 user.setName(updateProfileWithPhotoDTO.getName());
-                System.out.println(user.toString());
                 userRepository.save(user);
                 return json;
             }
@@ -539,25 +539,21 @@ public class GeneralService {
         }
 
         try {
-            BufferedImage bufferedImage = resize(createImageFromBytes(file.getBytes()),36,36);
+            BufferedImage bufferedImage = resize(createImageFromBytes(file.getBytes()), 36, 36);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if (jpg){
-                ImageIO.write( bufferedImage, "jpg", baos );
-            }else {
-                ImageIO.write( bufferedImage, "png", baos );
+            if (jpg) {
+                ImageIO.write(bufferedImage, "jpg", baos);
+            } else {
+                ImageIO.write(bufferedImage, "png", baos);
             }
             baos.flush();
             baos.close();
 
-
-            FileOutputStream fileOutputStream = new FileOutputStream(dirStr+"\\"+file.getOriginalFilename());
+            FileOutputStream fileOutputStream = new FileOutputStream(dirStr + "\\" + file.getOriginalFilename());
             fileOutputStream.write(baos.toByteArray());
 
             fileOutputStream.close();
-            //File img = new File(imageLocalPath);
-            //img.createNewFile();
-            //file.transferTo(img.toPath());
         } catch (IOException e) {
             e.printStackTrace();
         }

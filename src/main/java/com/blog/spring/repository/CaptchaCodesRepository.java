@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
-public interface CaptchaCodesRepository extends CrudRepository<CaptchaCodes,Long> {
+public interface CaptchaCodesRepository extends CrudRepository<CaptchaCodes, Long> {
 
     @Query("select e from CaptchaCodes e where ?2 < e.time+3600 and e.secretCode = ?1")
-    CaptchaCodes findCaptchaCodesBySecretCode(String secretCode,Long time);
+    CaptchaCodes findCaptchaCodesBySecretCode(String secretCode, Long time);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from captcha_codes where ?1 > captcha_codes.time+3600 and captcha_codes.id > 0;",nativeQuery = true)
+    @Query(value = "delete from captcha_codes where ?1 > captcha_codes.time+3600 and captcha_codes.id > 0;", nativeQuery = true)
     void removeOldCaptcha(Long time);
 }

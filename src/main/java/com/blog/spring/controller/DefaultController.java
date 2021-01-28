@@ -21,22 +21,21 @@ public class DefaultController {
     private GlobalSettingsRepository globalSettingsRepository;
 
     @PostConstruct
-    public void init(){
+    public void init() {
 
         logger.info("Инициализация настроек блога");
 
-        if (globalSettingsRepository.count() == 0){
-            GlobalSettings multiUserMode = new GlobalSettings(1,"MULTIUSER_MODE","Многопользовательский режим","YES");
-            GlobalSettings postPreModeration = new GlobalSettings(2,"POST_PREMODERATION","Премодерация постов","YES");
-            GlobalSettings statisticsIsPublic = new GlobalSettings(3,"STATISTICS_IS_PUBLIC","Показывать всем статистику блога","YES");
+        if (globalSettingsRepository.count() == 0) {
+            GlobalSettings multiUserMode = new GlobalSettings(1, "MULTIUSER_MODE", "Многопользовательский режим", "YES");
+            GlobalSettings postPreModeration = new GlobalSettings(2, "POST_PREMODERATION", "Премодерация постов", "YES");
+            GlobalSettings statisticsIsPublic = new GlobalSettings(3, "STATISTICS_IS_PUBLIC", "Показывать всем статистику блога", "YES");
             List<GlobalSettings> settings = Arrays.asList(multiUserMode, postPreModeration, statisticsIsPublic);
             globalSettingsRepository.saveAll(settings);
         }
     }
 
-    @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
-    public String index()
-    {
+    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+    public String index() {
         logger.info("/ Возвращена главная страница");
         return "index";
     }

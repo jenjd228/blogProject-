@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
 import java.util.Properties;
 
 @Configuration
@@ -23,6 +26,9 @@ public class MailConfig {
     @Value("${spring.mail.password}")
     private String springMailPassword;
 
+    @Value("${mail.transport.protocol}")
+    private String protocol;
+
     @Value("${spring.mail.properties.mail.smtp.auth}")
     private String springMailPropertiesMailSmtpAuth;
 
@@ -39,12 +45,19 @@ public class MailConfig {
 
         Properties properties = new Properties();
 
-        properties.put("mail.transport.protocol","smtp");
+        properties.put("mail.transport.protocol",protocol);
         properties.put("mail.smtp.auth",springMailPropertiesMailSmtpAuth);
         properties.put("mail.smtp.starttls.enable",springMailPropertiesMailSmtpStarttlsEnable);
         properties.put("mail.debug","true");
 
-        mailSender.setJavaMailProperties(properties);
+        Authenticator auth = new Authenticator() {
+            public PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(springMailUsername, springMailPassword);
+            }
+        };
+
+        Session session = Session.getInstance(properties, auth);
+        mailSender.setSession(session);
         return mailSender;
     }
 

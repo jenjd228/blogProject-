@@ -1,6 +1,5 @@
 package com.blog.spring.config;
 
-import com.blog.spring.controller.ApiAuthController;
 import com.blog.spring.service.AuthService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

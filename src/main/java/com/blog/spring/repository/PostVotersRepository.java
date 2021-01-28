@@ -4,7 +4,6 @@ import com.blog.spring.DTO.Statistics;
 import com.blog.spring.model.PostVotes;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -33,7 +32,7 @@ public interface PostVotersRepository extends CrudRepository<PostVotes, Integer>
             " (select count(*) from post_voters join posts on post_voters.post_id = posts.id where value = -1 and posts.user_id = ?1) as dislikesCount," +
             " (select count(*) from posts where posts.user_id = ?1) as postsCount," +
             " (select sum(posts.view_count) from posts where posts.user_id = ?1) as viewsCount," +
-            " (select min(posts.time) from posts where posts.user_id = ?1) as firstPublication from post_voters join posts on post_voters.post_id = posts.id where value = 1 and posts.user_id = ?1 ;",nativeQuery = true)
+            " (select min(posts.time) from posts where posts.user_id = ?1) as firstPublication from post_voters join posts on post_voters.post_id = posts.id where value = 1 and posts.user_id = ?1 ;", nativeQuery = true)
     Statistics getMyStatistics(Integer id);
 
     @Query(value = "select e from PostVotes e where e.postId = ?1 and e.userId = ?2")

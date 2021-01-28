@@ -7,10 +7,8 @@ import com.blog.spring.model.*;
 import com.blog.spring.repository.*;
 import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +19,10 @@ import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
@@ -90,7 +91,7 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
-        post.getUser().setPhoto("http://"+InetAddress.getLoopbackAddress().getHostName()+":"+port+"/"+post.getUser().getPhoto());
+        post.getUser().setPhoto("http://" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + post.getUser().getPhoto());
         return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 

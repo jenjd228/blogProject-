@@ -15,7 +15,7 @@ public class SendEmail {
     @Autowired
     private MailSender mailSender;
 
-    public void sendEmail(String message, String toEmail){
+    public void sendEmail(String message, String toEmail) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(toEmail);
         msg.setFrom(springMailUsername);

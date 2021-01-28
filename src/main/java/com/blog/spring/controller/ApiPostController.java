@@ -86,7 +86,7 @@ public class ApiPostController {
 
     @GetMapping("moderation")
     public ResponseEntity getPostsForModeration(@RequestParam Integer offset, @RequestParam Integer limit, @RequestParam String status) {
-        logger.info("/moderation - Запрос постов на модерацию со статусом : "+status);
+        logger.info("/moderation - Запрос постов на модерацию со статусом : " + status);
         return new ResponseEntity(postsService.getPostsForModeration(offset, limit, status), HttpStatus.OK);
     }
 

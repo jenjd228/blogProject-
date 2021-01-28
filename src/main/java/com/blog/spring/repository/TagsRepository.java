@@ -10,16 +10,16 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface TagsRepository extends CrudRepository<Tags,Integer> {
+public interface TagsRepository extends CrudRepository<Tags, Integer> {
 
-        Tags findTagByName(String name);
+    Tags findTagByName(String name);
 
-        List<Tags> findTagsByNameContaining(String query);
+    List<Tags> findTagsByNameContaining(String query);
 
-        List<Tags> findTagsIdByNameIn(List<String> tags);
+    List<Tags> findTagsIdByNameIn(List<String> tags);
 
-        @Transactional
-        @Modifying
-        @Query(value = "insert ignore into tags(name) values (?1)", nativeQuery = true)
-        void saveIgnoreDuplicateKey(String name);
+    @Transactional
+    @Modifying
+    @Query(value = "insert ignore into tags(name) values (?1)", nativeQuery = true)
+    void saveIgnoreDuplicateKey(String name);
 }
