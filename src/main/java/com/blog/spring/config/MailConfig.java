@@ -1,5 +1,6 @@
 package com.blog.spring.config;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,8 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfig {
+
+    private final Logger logger = Logger.getLogger(MailConfig.class);
 
     @Value("${spring.mail.host}")
     private String springMailHost;
@@ -36,19 +39,22 @@ public class MailConfig {
     private String springMailPropertiesMailSmtpStarttlsEnable;
 
     @Bean
-    public MailSender mainSender(){
+    public MailSender mainSender() {
+        logger.info("Mail " + springMailUsername + "mail.smtp.starttls.enable : " + springMailPropertiesMailSmtpStarttlsEnable + "mail.smtp.auth: " + springMailPropertiesMailSmtpAuth);
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(springMailHost);
         mailSender.setPort(springMailPort);
+
         mailSender.setUsername(springMailUsername);
         mailSender.setPassword(springMailPassword);
 
-        Properties properties = new Properties();
+        Properties properties = mailSender.getJavaMailProperties();
 
-        properties.put("mail.transport.protocol",protocol);
-        properties.put("mail.smtp.auth",springMailPropertiesMailSmtpAuth);
-        properties.put("mail.smtp.starttls.enable",springMailPropertiesMailSmtpStarttlsEnable);
-        properties.put("mail.debug","true");
+        properties.put("mail.transport.protocol", protocol);
+        properties.put("mail.smtp.auth", springMailPropertiesMailSmtpAuth);
+        properties.put("mail.smtp.starttls.enable", springMailPropertiesMailSmtpStarttlsEnable);
+        properties.put("mail.debug", "true");
+        properties.put("mail.from.email", springMailUsername);
 
         Authenticator auth = new Authenticator() {
             public PasswordAuthentication getPasswordAuthentication() {
