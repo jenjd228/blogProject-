@@ -39,6 +39,9 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class GeneralService {
 
+    @Value("${domain}")
+    private String domain;
+
     @Qualifier("modelMapperToTagForTagsDTO")
     private final ModelMapper modelMapperToTagForTagsDTO;
 
@@ -411,7 +414,7 @@ public class GeneralService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            json.put("imageLocalPath", "http//" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + imageLocalPath);
+            json.put("imageLocalPath", domain + ":" + port + "/" + imageLocalPath);
             return json;
         }
         return null;

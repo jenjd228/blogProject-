@@ -29,6 +29,12 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class PostsService {
 
+    @Value("${domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
     @Qualifier("modelMapperToPostsDTO")
     private final ModelMapper modelMapperToPostsDTO;
 
@@ -46,9 +52,6 @@ public class PostsService {
     private final AuthService authService;
 
     private final PostVotersRepository postVotersRepository;
-
-    @Value("${server.port}")
-    private String port;
 
     public PostsService(GlobalSettingsRepository globalSettingsRepository, PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
         this.globalSettingsRepository = globalSettingsRepository;
@@ -91,7 +94,7 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
-        post.getUser().setPhoto("http://" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + post.getUser().getPhoto());
+        post.getUser().setPhoto(domain + ":" + port + "/" + post.getUser().getPhoto());
         return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 

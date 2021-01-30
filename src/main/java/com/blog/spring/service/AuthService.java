@@ -37,6 +37,9 @@ import java.util.regex.Pattern;
 @Service
 public class AuthService {
 
+    @Value("${domain}")
+    private String domain;
+
     private final CaptchaCodesRepository captchaCodesRepository;
 
     public final UserRepository userRepository;
@@ -270,7 +273,7 @@ public class AuthService {
             user.setCode(code);
             userRepository.save(user);
 
-            sendEmail.sendEmail("Ваша ссылка : /login/change-password/" + code, email);
+            sendEmail.sendEmail("Ваша ссылка : "+domain+"/login/change-password/" + code, email);
             json.put("result", true);
         } else {
             json.put("result", false);
@@ -322,7 +325,7 @@ public class AuthService {
             userLoginDTO.setModerationCount(0);
         }
         if (userLoginDTO.getPhoto() != null) {
-            userLoginDTO.setPhoto("http://" + InetAddress.getLoopbackAddress().getHostName() + ":" + port + "/" + userLoginDTO.getPhoto());
+            userLoginDTO.setPhoto(domain+ ":" + port + "/" + userLoginDTO.getPhoto());
         }
         return userLoginDTO;
     }
