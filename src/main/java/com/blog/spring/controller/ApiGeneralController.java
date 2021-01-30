@@ -142,6 +142,6 @@ public class ApiGeneralController {
             return new ResponseEntity(response,HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(response.get("imageLocalPath"),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(response.get("imageLocalPath"),HttpStatus.OK);
     }
 }
