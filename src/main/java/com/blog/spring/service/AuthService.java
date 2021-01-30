@@ -55,9 +55,6 @@ public class AuthService {
 
     private HashMap<String, Integer> currentUsers;
 
-    @Value("${server.port}")
-    private String port;
-
     AuthService(PasswordEncoder passwordEncoder, PostsRepository postsRepository, CaptchaCodesRepository captchaCodesRepository, UserRepository userRepository, SendEmail sendEmail, ModelMapper modelMapperToUserLoginDTO) {
         this.passwordEncoder = passwordEncoder;
         this.postsRepository = postsRepository;

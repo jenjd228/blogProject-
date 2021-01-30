@@ -530,8 +530,8 @@ public class GeneralService {
         String second = random.substring(2, 4);
         String third = random.substring(4, 6);
 
-        String dirStr = "upload\\" + first + "\\" + second + "\\" + third;
-        String imageLocalPath = dirStr + "\\" + file.getOriginalFilename();
+        String dirStr ="upload/" + first + "/" + second + "/" + third;
+        String imageLocalPath = dirStr + "/" + file.getOriginalFilename();
         File dir = new File(dirStr);
 
         if (!dir.exists()) {
@@ -550,7 +550,7 @@ public class GeneralService {
             baos.flush();
             baos.close();
 
-            FileOutputStream fileOutputStream = new FileOutputStream(dirStr + "\\" + file.getOriginalFilename());
+            FileOutputStream fileOutputStream = new FileOutputStream(imageLocalPath);
             fileOutputStream.write(baos.toByteArray());
 
             fileOutputStream.close();
