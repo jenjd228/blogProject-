@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -31,9 +30,6 @@ public class PostsService {
 
     @Value("${domain}")
     private String domain;
-
-    @Value("${server.port}")
-    private String port;
 
     @Qualifier("modelMapperToPostsDTO")
     private final ModelMapper modelMapperToPostsDTO;
@@ -94,7 +90,7 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
-        post.getUser().setPhoto(domain + ":" + port + "/" + post.getUser().getPhoto());
+        post.getUser().setPhoto(domain + "/" + post.getUser().getPhoto());
         return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
     }
 

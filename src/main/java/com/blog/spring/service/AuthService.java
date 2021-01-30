@@ -1,6 +1,7 @@
 package com.blog.spring.service;
 
 import com.blog.spring.DTO.CaptchaDTO;
+import com.blog.spring.DTO.PasswordDTO;
 import com.blog.spring.DTO.RegisterDTO;
 import com.blog.spring.DTO.UserLoginDTO;
 import com.blog.spring.Email.SendEmail;
@@ -206,10 +207,10 @@ public class AuthService {
         return json;
     }
 
-    public JSONObject password(String code, String password, String captcha, String captchaSecret) {
+    public JSONObject password(PasswordDTO passwordDTO) {
         JSONObject json = new JSONObject();
-        Users user = userRepository.findUsersByCode(code);
-        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(captchaSecret, LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
+        Users user = userRepository.findUsersByCode(passwordDTO.getCode());
+        CaptchaCodes captchaCodes = captchaCodesRepository.findCaptchaCodesBySecretCode(passwordDTO.getCaptchaSecret(), LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
 
         boolean result = true;
         HashMap<String, String> errors = new HashMap<>();
@@ -227,23 +228,22 @@ public class AuthService {
                     "<a href=\"/auth/restore\">Запросить ссылку снова</a>");
         }
 
-        if (!captcha.equals(codeCaptcha)) {
+        if (!passwordDTO.getCaptcha().equals(codeCaptcha)) {
             result = false;
             errors.put("captcha", "Код с картинки введён неверно");
         }
 
-        if (!checkPassword(password)) {
+        if (!checkPassword(passwordDTO.getPassword())) {
             result = false;
             errors.put("password", "Пароль короче 6-ти символов");
         }
-
 
         json.put("result", result);
         if (!result) {
             json.put("errors", errors);
         } else {
             user.setCode(null);
-            user.setPassword(passwordEncoder.encode(password));
+            user.setPassword(passwordEncoder.encode(passwordDTO.getPassword()));
             userRepository.save(user);
         }
 
@@ -325,7 +325,7 @@ public class AuthService {
             userLoginDTO.setModerationCount(0);
         }
         if (userLoginDTO.getPhoto() != null) {
-            userLoginDTO.setPhoto(domain+ ":" + port + "/" + userLoginDTO.getPhoto());
+            userLoginDTO.setPhoto(domain + "/" + userLoginDTO.getPhoto());
         }
         return userLoginDTO;
     }

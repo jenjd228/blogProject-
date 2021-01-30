@@ -65,9 +65,6 @@ public class GeneralService {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${server.port}")
-    private String port;
-
     public GeneralService(PasswordEncoder passwordEncoder, UserRepository userRepository, TagsRepository tagsRepository, PostCommentsRepository postCommentsRepository, PostVotersRepository postVotersRepository, ModelMapper modelMapperToStatisticDTO, AuthService authService, GlobalSettingsRepository globalSettingsRepository, ModelMapper modelMapperToTagForTagsDTO, PostsRepository postsRepository, Tag2PostRepository tag2PostRepository) {
         this.passwordEncoder = passwordEncoder;
         this.tagsRepository = tagsRepository;
@@ -414,7 +411,7 @@ public class GeneralService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            json.put("imageLocalPath", domain + ":" + port + "/" + imageLocalPath);
+            json.put("imageLocalPath", domain + "/" + imageLocalPath);
             return json;
         }
         return null;

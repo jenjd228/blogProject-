@@ -74,14 +74,14 @@ public class ApiPostController {
 
     @PostMapping("like")
     public ResponseEntity like(@RequestBody PostIdOnlyDTO postIdOnlyDTO) {
-        logger.info("/like - Лайк поста с id : " + postIdOnlyDTO.getPost_id());
-        return new ResponseEntity(postsService.like(postIdOnlyDTO.getPost_id()), HttpStatus.OK);
+        logger.info("/like - Лайк поста с id : " + postIdOnlyDTO.getPostId());
+        return new ResponseEntity(postsService.like(postIdOnlyDTO.getPostId()), HttpStatus.OK);
     }
 
     @PostMapping("dislike")
     public ResponseEntity dislike(@RequestBody PostIdOnlyDTO postIdOnlyDTO) {
-        logger.info("/dislike - Дизлайк поста с id : " + postIdOnlyDTO.getPost_id());
-        return new ResponseEntity(postsService.dislike(postIdOnlyDTO.getPost_id()), HttpStatus.OK);
+        logger.info("/dislike - Дизлайк поста с id : " + postIdOnlyDTO.getPostId());
+        return new ResponseEntity(postsService.dislike(postIdOnlyDTO.getPostId()), HttpStatus.OK);
     }
 
     @GetMapping("moderation")

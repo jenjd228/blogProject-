@@ -2,6 +2,7 @@ package com.blog.spring.controller;
 
 import com.blog.spring.DTO.EmailOnlyDTO;
 import com.blog.spring.DTO.EmailPasswordUserDTO;
+import com.blog.spring.DTO.PasswordDTO;
 import com.blog.spring.DTO.RegisterDTO;
 import com.blog.spring.service.AuthService;
 import org.apache.log4j.Logger;
@@ -38,11 +39,9 @@ public class ApiAuthController {
     }
 
     @PostMapping("password")
-    public ResponseEntity password(@RequestParam String code, @RequestParam String password,
-                                   @RequestParam String captcha,
-                                   @RequestParam String captchaSecret) {
+    public ResponseEntity password(@RequestBody PasswordDTO passwordDTO) {
         logger.info("/api/auth/password - Запрос на изменение пароля");
-        return new ResponseEntity(authService.password(code, password, captcha, captchaSecret), HttpStatus.OK);
+        return new ResponseEntity(authService.password(passwordDTO), HttpStatus.OK);
     }
 
     @PostMapping("login")
