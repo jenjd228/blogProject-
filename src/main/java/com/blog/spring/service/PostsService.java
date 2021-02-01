@@ -1,8 +1,6 @@
 package com.blog.spring.service;
 
-import com.blog.spring.DTO.AddPostDTO;
-import com.blog.spring.DTO.ModerationDTO;
-import com.blog.spring.DTO.PostsDTO;
+import com.blog.spring.DTO.*;
 import com.blog.spring.model.*;
 import com.blog.spring.repository.*;
 import net.minidev.json.JSONObject;
@@ -34,9 +32,6 @@ public class PostsService {
     @Qualifier("modelMapperToPostsDTO")
     private final ModelMapper modelMapperToPostsDTO;
 
-    @Qualifier("modelMapperForByIdPost")
-    private final ModelMapper modelMapperForByIdPost;
-
     private final PostsRepository postsRepository;
 
     private final TagsRepository tagsRepository;
@@ -49,11 +44,10 @@ public class PostsService {
 
     private final PostVotersRepository postVotersRepository;
 
-    public PostsService(GlobalSettingsRepository globalSettingsRepository, PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, ModelMapper modelMapperForByIdPost, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
+    public PostsService(GlobalSettingsRepository globalSettingsRepository, PostVotersRepository postVotersRepository, AuthService authService, ModelMapper modelMapperToPostsDTO, PostsRepository postsRepository, TagsRepository tagsRepository, Tag2PostRepository tag2PostRepository) {
         this.globalSettingsRepository = globalSettingsRepository;
         this.postVotersRepository = postVotersRepository;
         this.authService = authService;
-        this.modelMapperForByIdPost = modelMapperForByIdPost;
         this.modelMapperToPostsDTO = modelMapperToPostsDTO;
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
@@ -90,8 +84,56 @@ public class PostsService {
 
     public PostForGetByIdPost getPostById(Integer id) {
         Posts post = postsRepository.findPostsById(id);
-        post.getUser().setPhoto(domain + "/" + post.getUser().getPhoto());
-        return Objects.isNull(post) ? null : modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
+        //PostForGetByIdPost postForGetByIdPost = modelMapperForByIdPost.map(post, PostForGetByIdPost.class);
+        PostForGetByIdPost postForGetByIdPost2 = convertToPostForGetByIdPost(post);
+        return postForGetByIdPost2;
+    }
+
+    private PostForGetByIdPost convertToPostForGetByIdPost(Posts posts){
+        PostForGetByIdPost postForGetByIdPost = new PostForGetByIdPost();
+
+        postForGetByIdPost.setActive(posts.getIsActive());
+        postForGetByIdPost.setTimestamp(posts.getTime());
+        postForGetByIdPost.setId(posts.getId());
+        postForGetByIdPost.setText(posts.getText());
+        postForGetByIdPost.setTitle(posts.getTitle());
+
+        postForGetByIdPost.setViewCount(posts.getViewCount());
+        postForGetByIdPost.setDislikeCount(posts.getDislikeVotes());
+        postForGetByIdPost.setLikeCount(posts.getLikeVotes());
+        postForGetByIdPost.setTags(posts.getTags());
+        postForGetByIdPost.setComments(getCommentDTOByConvertUsers(posts.getCommentCount()));
+        postForGetByIdPost.setUser(getUserDTOByConvertUsers(posts.getUser()));
+
+        return postForGetByIdPost;
+    }
+
+    private UsersDTO getUserDTOByConvertUsers(Users users){
+        UsersDTO usersDTO = new UsersDTO();
+        usersDTO.setId(users.getId());
+        usersDTO.setName(users.getName());
+        return usersDTO;
+    }
+
+    private List<CommentDTO> getCommentDTOByConvertUsers(List<PostComments> list){
+        List<CommentDTO> commentDTOS = new ArrayList<>();
+        for (PostComments postComments : list){
+            CommentDTO commentDTO = new CommentDTO();
+            commentDTO.setId(postComments.getId());
+            commentDTO.setTimestamp(postComments.getTime());
+            commentDTO.setText(postComments.getText());
+            commentDTO.setUser(getUserForCommentDTOByConvertUsers(postComments.getUser()));
+            commentDTOS.add(commentDTO);
+        }
+        return commentDTOS;
+    }
+
+    private UserForCommentDTO getUserForCommentDTOByConvertUsers(Users users){
+        UserForCommentDTO userForCommentDTO = new UserForCommentDTO();
+        userForCommentDTO.setId(users.getId());
+        userForCommentDTO.setName(users.getName());
+        userForCommentDTO.setPhotoWithDomain(users.getPhoto(),domain);
+        return userForCommentDTO;
     }
 
     public PostsForResponse getPostBySearch(Integer offset, Integer limit, String search) {

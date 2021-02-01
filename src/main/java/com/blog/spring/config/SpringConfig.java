@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.MailSender;
@@ -21,6 +22,9 @@ import java.util.Properties;
 
 @Configuration
 public class SpringConfig {
+
+    @Value("${domain}")
+    private String domain;
 
     @Bean
     public PasswordEncoder encoder() {
@@ -41,32 +45,6 @@ public class SpringConfig {
             }
         };
         modelMapper.addMappings(propertyMap);
-        return modelMapper;
-    }
-
-    @Bean
-    public ModelMapper modelMapperForByIdPost() {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        PropertyMap<Posts, PostForGetByIdPost> propertyMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setTimestamp(source.getTime());
-                map().setActive(source.getIsActive());
-                map(source.getUser(), destination.getUser());
-                map(source.getCommentCount(), destination.getComments());
-                map().setDislikeCount(source.getDislikeVotes());
-                map().setLikeCount(source.getLikeVotes());
-                map().setTags(source.getTags());
-            }
-        };
-        PropertyMap<PostComments, CommentDTO> propertyMapToCommentDTO = new PropertyMap<>() {
-            protected void configure() {
-                map(source.getUser(), destination.getUser());
-                map().setTimestamp(source.getTime());
-            }
-        };
-        modelMapper.addMappings(propertyMap);
-        modelMapper.addMappings(propertyMapToCommentDTO);
         return modelMapper;
     }
 
