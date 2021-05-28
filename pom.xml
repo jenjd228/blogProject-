@@ -40,7 +40,7 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <artifactId>spring-boot-starter-thymelxeaf</artifactId>
             <version>2.3.2.RELEASE</version>
         </dependency>
         <dependency>
